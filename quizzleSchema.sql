@@ -46,10 +46,10 @@ DROP TABLE IF EXISTS answers;
 
 CREATE TABLE answers (
 answer_id INTEGER PRIMARY KEY AUTOINCREMENT,
-question_id TEXT NOT NULL,
+question_id INTEGER NOT NULL,
 answer TEXT NOT NULL,
 is_correct TEXT NOT NULL,
-FOREIGN KEY(question_id) REFERENCES questions(question_id),
+FOREIGN KEY(question_id) REFERENCES questions(question_id)
 );
 
 DROP TABLE IF EXISTS quiz_scores;
@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS quiz_scores;
 CREATE TABLE quiz_scores (
 score_id INTEGER PRIMARY KEY AUTOINCREMENT,
 quiz_id INTEGER NOT NULL,
-user_id TEXT NOT NULL,
+user_id INTEGER NOT NULL,
 score TEXT NOT NULL,
 FOREIGN KEY(quiz_id) REFERENCES quizzes(quiz_id),
 FOREIGN KEY(user_id) REFERENCES users(user_id)
