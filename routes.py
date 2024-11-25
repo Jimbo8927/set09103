@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g
+from flask import Flask, render_template, g, session
 import sqlite3, configparser
 
 app = Flask(__name__)
@@ -7,38 +7,40 @@ def init(app):
     config = configparser.ConfigParser()
     try:
         print("INIT FUNCTION")
-	config_location = "etc/defaults.cfg"
-	config.read(config_location)
+        config_location = "etc/defaults.cfg"
+        config.read(config_location)
 
-	app.config['DEBUG'] = config.get("config", "debug")
-	app.config['ip_address'] = config.get("config", "ip_address")
-	app.config['port'] = config.get("config", "port")
-	app.config['url'] = config.get("config", "url")
+        app.config['DEBUG'] = config.get("config", "debug")
+        app.config['ip_address'] = config.get("config", "ip_address")
+        app.config['port'] = config.get("config", "port")
+        app.config['url'] = config.get("config", "url")
+        app.config['db_location'] = config.get("config", "db_location")
+        app.config['secret_key'] = config.get("config", "secret_key")
     except:
-        print("Cound not read configs from: " config_location)
+        print("Cound not read configs from: ", config_location)
 init(app)
 
-db_location = 'var/quizzle.db'
+#db_location = 'var/quizzle.db'
 
 def get_db():
     db = getattr(g, 'db', None)
     if db is None:
-	db = sqlite3.connect(db_location)
-	g.db = db
+        db = sqlite3.connect(db_location)
+        g.db = db
     return db
 
 @app.teardown_appcontext
 def close_db_connection(exception):
     db = getattr(g, 'db', None)
     if db is not None:
-	db.close()
+        db.close()
 
 def init_db():
     with app.app_context():
-	db = get_db()
-	with app.open_resource('quizzleSchema.sql', mode='r') as f:
-	    db.cursor().executescript(f.read())
-	db.commit()
+        db = get_db()
+        with app.open_resource('quizzleSchema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
 
 @app.route('/')
 def basicTemplate():
@@ -51,6 +53,10 @@ def login():
 @app.route('/sign-up')
 def signup():
     return render_template('sign-up.html')
+
+@app.route('/add-admin')
+def addAdmin():
+    return render_template('add-admin.html')
 
 @app.route('/config')
 def config():
