@@ -1,35 +1,29 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
 <h1 class="text-center">Enter Details Below</h1>
-<form>
+<form name="add-admin-account" action="" method="post">
 
 
     <div class="d-flex flex-row justify-content-around">
 
-	<div class"d-flex flex-column">
-	    <label>Select an Image</label>
-	    <input type="button"><image src="static/images/profile-pics/profile-pic-8"></input> 
-
-	</div>
-
         <div class="d-flex flex-column">
             <label for="fname">First Name </label><br>
-            <input type="text" id="fname" name="fname"> </input><br>
+            <input type="text" id="fname" name="fname" required> </input><br>
 
            <label for="surname">Surname</label><br>
-           <input type="text" id="surname" name="surname"> </input><br>
+           <input type="text" id="surname" name="surname" required> </input><br>
         </div>
 
         <div class="d-flex flex-column">
             <label for="username">Username</label><br>
-            <input type="text" id="username" name="username"> </input><br>
+            <input type="text" id="username" name="username" required> </input><br>
 
             <label for="email">Email Address</label><br>
-            <input type="email" id="email" name="email"> </input><br>
+            <input type="email" id="email" name="email" required> </input><br>
         </div>
     </div>
     <div class="text-center">
-        <button type="submit" class="btn btn-secondary " name="button" value="sign up">Sign Up</button>
+        <button type="submit" class="btn btn-secondary " name="button" value="sign up">Add Admin</button>
     </div>
 
 </form>

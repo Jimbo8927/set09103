@@ -1,5 +1,5 @@
-from flask import Flask, render_template, g, session
-import sqlite3, configparser
+from flask import Flask, render_template, g, session, request
+import sqlite3, configparser, secrets, bcrypt
 
 app = Flask(__name__)
 
@@ -18,9 +18,11 @@ def init(app):
         app.config['secret_key'] = config.get("config", "secret_key")
     except:
         print("Cound not read configs from: ", config_location)
+        
+
 init(app)
 
-#db_location = 'var/quizzle.db'
+db_location = 'var/quizzle.db'
 
 def get_db():
     db = getattr(g, 'db', None)
@@ -54,9 +56,21 @@ def login():
 def signup():
     return render_template('sign-up.html')
 
-@app.route('/add-admin')
+@app.route('/add-admin', methods =['GET', 'POST'])
 def addAdmin():
-    return render_template('add-admin.html')
+    if request.method == 'POST':
+
+        name = request.form['fname']
+        surname = request.form['surname']
+        username = request.form['username']
+        email = request.form['email']
+
+        password = secrets.token_urlsafe(8)
+        passhash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
+    else:
+        return render_template('add-admin.html')
 
 @app.route('/config')
 def config():

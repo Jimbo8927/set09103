@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS admins;
 
 CREATE TABLE admins (
 admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
-image_path TEXT NOT NULL,
 first_name TEXT NOT NULL,
 surname TEXT NOT NULL,
 email_address TEXT NOT NULL UNIQUE,
@@ -15,7 +14,6 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-image_path TEXT NOT NULL,
 first_name TEXT NOT NULL,
 surname TEXT NOT NULL,
 email_address TEXT NOT NULL UNIQUE,

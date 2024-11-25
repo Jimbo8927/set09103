@@ -1,0 +1,29 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+<div class ="text-center p-3">
+<h4>Account Added Successfully, take note of the password as once you leave this page you will no longer be able to retrieve it. </h4>
+
+  <div class="d-flex flex-row justify-content-around">
+
+        <div class="d-flex flex-column">
+            <label>First Name: </label><br>
+            <p> {{ name }} </p><br>
+
+           <label>Surname:</label><br>
+           <p> {{ surname }} </p><br>
+        </div>
+
+        <div class="d-flex flex-column">
+            <label>Username:</label><br>
+            <p> {{ username }} </p><br>
+
+            <label>Email Address:</label><br>
+            <p> {{ email }} </p><br>
+        </div>
+
+        <div class="d-flex flex-column">
+            <label>Password:</label><br>
+            <p> {{ password }} </p><br>
+        </div>
+    </div>
+{% endblock %}
