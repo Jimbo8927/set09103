@@ -18,7 +18,7 @@ def init(app):
         app.config['secret_key'] = config.get("config", "secret_key")
     except:
         print("Cound not read configs from: ", config_location)
-
+#print(app.config['secret_key'])
 
 init(app)
 
@@ -130,6 +130,8 @@ def config():
     s.append('port: '+app.config['port'])
     s.append('url: '+app.config['url'])
     s.append('ip_address: '+app.config['ip_address'])
+    s.append('db_location: '+app.config['db_location'])
+    s.append('secret_key: '+app.config['secret_key'])
     return ', '.join(s)
 
 if __name__ == "__main__":
