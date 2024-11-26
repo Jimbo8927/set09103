@@ -60,18 +60,20 @@ def login():
         cursor = db.cursor()
 
         try:
-            cursor.execute("SELECT username, password FROM admins WHERE username = ? AND password = ? UNION ALL SELECT username, password FROM users WHERE username = ? AND password = ?", (username, password, username, password))
+           # cursor.execute("SELECT username, password FROM admins WHERE username = ? UNION ALL SELECT username, password FROM users WHERE username = ?", (username, username))
+            cursor.execute("SELECT username, password FROM admins WHERE username = ?", (username))
             record = cursor.fetchone()
-
-            if record:
-                if record['username'] == username and record['password'] == password:
-                    errorMessage = "got them"
-                    return render_template('log-in.html', error=errorMessage)
-                else:
-                    errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
-            return render_template('log-in.html', error=errorMessage)
+            return username
+           # if record:
+            #    if record['username'] == username and record['password'] == bcrypt.checkpw(password.encode('utf-8'), record['password']):
+             #       errorMessage = "got them"
+           # return render_template('log-in.html', error=errorMessage)
+               # else:
+               #     errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
+           # return render_template('log-in.html', error=errorMessage)
         except:
-            return "placeholder"
+            errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
+            return render_template('log-in.html', error=errorMessage)
     else:
         return render_template('log-in.html')
 
