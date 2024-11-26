@@ -2,7 +2,24 @@
 {% block content %}
 <h1 class="text-center">Log In</h1>
 
+<form name="sign-in" action="" method="post">
 
+
+    <div class="d-flex flex-row justify-content-around">
+
+        <div class="d-flex flex-column">
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" required> </input><br>
+
+           <label for="password">Password</label><br>
+           <input type="password" id="password" name="password" required> </input><br>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-secondary " name="button" value="sign up">Log In</button>
+    </div>
+
+</form>
 
 
 
