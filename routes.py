@@ -69,29 +69,32 @@ def addAdmin():
         passhash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         db = get_db()
+        cursor = db.cursor()
         try:
-            db.row_factory = sqlitee3.Row
-            db.cursor().execute("SELECT username, email_address FROM users WHERE username = ? OR email = ?  UNION ALL SELECT username, email_address FROM admins WHERE username = ? OR email = ?", (username, email, username, email))
-
+            db.row_factory = sqlite3.Row
+           # cursor.execute("SELECT username, email_address FROM users WHERE username = ? OR email = ? UNION ALL SELECT username, email_address FROM admins WHERE username = ? OR email = ?", (username, email, username, email))
+            cursor.execute("SELECT * FROM admin WHERE username = username")
             record = cursor.fetchone()
+            return render_template(add_admin, error = record['username'])
 
-            if record:
-                if record['username'] == username and record['email'] == email:
-                    errorMessage = "username and email are in use, sign in to your account"
-                elif record['username'] == username:
-                    errorMessage = "username is in use, please choose another"
-                elif  record['email'] == email:
-                    errorMessage = "email is in use, sign in to your account"
+           # if record:
+           #     if record['username'] == username and record['email'] == email:
+           #         errorMessage = "username and email are in use, sign in to your account"
+           #         return render_template('add-admin.html', error=errorMessage)
+           #     elif record['username'] == username:
+           #         errorMessage = "username is in use, please choose another"
+           #         return render_template('add-admin.html', error=errorMessage)
+           #     elif  record['email'] == email:
+           #         errorMessage = "email is in use, sign in to your account"
+           #         return render_template('add-admin.html', error=errorMessage)
 
-                return render_template('add-admin.html', error=errorMessage)
 
 
+           # cursor.execute("INSERT INTO admins (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'admin'))
 
-            db.cursor().execute("INSERT INTO admins (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'admin'))
+           # db.commit()
 
-            db.commit()
-
-            return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
+           # return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
         except:
             return render_template('add-admin.html', error="An Error Occured, Account Wasn't Created")
     else:
