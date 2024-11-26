@@ -60,17 +60,17 @@ def login():
         cursor = db.cursor()
 
         try:
-           # cursor.execute("SELECT username, password FROM admins WHERE username = ? UNION ALL SELECT username, password FROM users WHERE username = ?", (username, username))
-            cursor.execute("SELECT username, password FROM admins WHERE username = ?", (username))
+            cursor.execute("SELECT username, password, account_type FROM admins WHERE username = ? UNION ALL SELECT username, password, account_type FROM users WHERE username = ?", (username, username))
+
             record = cursor.fetchone()
-            return username
-           # if record:
-            #    if record['username'] == username and record['password'] == bcrypt.checkpw(password.encode('utf-8'), record['password']):
-             #       errorMessage = "got them"
-           # return render_template('log-in.html', error=errorMessage)
-               # else:
-               #     errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
-           # return render_template('log-in.html', error=errorMessage)
+
+            if record:
+                if bcrypt.checkpw(password.encode('utf-8'), record['password']):
+                   # session['username'] = record['username']
+                   # session['account_type'] = record['account_type']
+                    errorMessage = "got them"
+            return render_template('log-in.html', error=errorMessage)
+
         except:
             errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
             return render_template('log-in.html', error=errorMessage)
