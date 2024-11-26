@@ -60,13 +60,16 @@ def login():
         cursor = db.cursor()
 
         try:
-            cursor.execute("SELECT username, password FROM admins WHERE username = ? OR email_address = ? UNION ALL SELECT username, email_address FROM users WHERE username = ? OR email_address = ?", (username, email))
+            cursor.execute("SELECT username, password FROM admins WHERE username = ? AND password = ? UNION ALL SELECT username, password FROM users WHERE username = ? AND password = ?", (username, password, username, password))
             record = cursor.fetchone()
 
             if record:
-                if record['username'] == username and record['email_address'] == email:
-                    errorMessage = "username and email are in use, sign in to your account"
-                    return render_template('add-admin.html', error=errorMessage)
+                if record['username'] == username and record['password'] == password:
+                    errorMessage = "got them"
+                    return render_template('log-in.html', error=errorMessage)
+                else:
+                    errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
+            return render_template('log-in.html', error=errorMessage)
         except:
             return "placeholder"
     else:

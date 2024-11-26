@@ -2,8 +2,9 @@
 {% block content %}
 <h1 class="text-center">Log In</h1>
 
-<form name="sign-in" action="" method="post">
+<form name="sign-in" action="" method="POST">
 
+<h3 class="text-center p-3"> {{ error }} </h3>
 
     <div class="d-flex flex-row justify-content-around">
 
@@ -16,7 +17,7 @@
         </div>
     </div>
     <div class="text-center">
-        <button type="submit" class="btn btn-secondary " name="button" value="sign up">Log In</button>
+        <button type="submit" class="btn btn-secondary " name="button" value="log in">Log In</button>
     </div>
 
 </form>
