@@ -68,9 +68,32 @@ def addAdmin():
         password = secrets.token_urlsafe(8)
         passhash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
-    else:
-        return render_template('add-admin.html')
+        db = get_db()
+        try:
+            db.cursor.execute("SELECT username, email_address FROM users WHERE username == username OR email == email_address  UNION ALL SELECT username, email_address FROM admins WHERE username == username OR email == email_address")
+
+            db.row_factory = sqlitee3.Row
+
+            if r['username'] == username and r['email'] == email:
+                errorMessage = "username and email are in use, sign in to your account"
+            elif r['username'] == username:
+                errorMessage = "username is in use, please choose another"
+            elif  r['email'] == email:
+                errorMessage = "email is in use, sign in to your account"
+
+            return render_template('add-admin.html', error=errorMessage)
+        except:
+
+            try:
+                db.cursor().execute("INSERT INTO admins (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'admin'))
+
+                db.commit()
+
+                return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
+            except:
+                return render_template('add-admin.html', error="An Error Occured, Account Wasn't Created")
+        else:
+            return render_template('add-admin.html')
 
 @app.route('/config')
 def config():
