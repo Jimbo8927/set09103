@@ -15,12 +15,13 @@ def init(app):
         app.config['port'] = config.get("config", "port")
         app.config['url'] = config.get("config", "url")
         app.config['db_location'] = config.get("config", "db_location")
-        app.config['secret_key'] = config.get("config", "secret_key")
+        app.secret_key = config.get("config", "secret_key")
     except:
         print("Cound not read configs from: ", config_location)
-#print(app.config['secret_key'])
 
 init(app)
+
+print(app.secret_key)
 
 db_location = 'var/quizzle.db'
 
@@ -64,10 +65,14 @@ def login():
 
             record = cursor.fetchone()
 
+            #session['username'] = record['username']
+
+            #return "Their details are " + session['username']
+
             if record:
                 if bcrypt.checkpw(password.encode('utf-8'), record['password']):
-                   # session['username'] = record['username']
-                   # session['account_type'] = record['account_type']
+                    session['username'] = record['username']
+                    session['account_type'] = record['account_type']
                     errorMessage = "got them"
             return render_template('log-in.html', error=errorMessage)
 
