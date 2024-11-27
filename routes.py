@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, session, request
+from flask import Flask, render_template, g, session, request, url_for, redirect, flash
 import sqlite3, configparser, secrets, bcrypt
 
 app = Flask(__name__)
@@ -46,7 +46,7 @@ def init_db():
         db.commit()
 
 @app.route('/')
-def basicTemplate():
+def home():
     return render_template('home.html')
 
 @app.route('/log-in', methods = ['GET', 'POST'])
@@ -78,6 +78,11 @@ def login():
             return render_template('log-in.html', error=errorMessage)
     else:
         return render_template('log-in.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 @app.route('/sign-up', methods =['GET', 'POST'])
 def signup():
@@ -111,11 +116,11 @@ def signup():
 
 
 
-      #      cursor.execute("INSERT INTO users (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'user'))
+            cursor.execute("INSERT INTO users (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'user'))
 
-       #     db.commit()
-
-            return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
+            db.commit()
+            flash("Account created successfully, please log in")
+            return redirect(url_for('login'))
         except:
             return render_template('sign-up.html', error="An Error Occured, Account Wasn't Created")
     else:

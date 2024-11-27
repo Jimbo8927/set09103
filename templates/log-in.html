@@ -6,13 +6,21 @@
 
 <h3 class="text-center p-3"> {{ error }} </h3>
 
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+        {% for message in messages %}
+            <p class="text-center p-3"><strong>{{ message }}</strong></p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
     <div class="d-flex flex-row justify-content-around">
 
         <div class="d-flex flex-column">
-            <label for="username">Username</label><br>
+            <label for="username"><strong>Username</strong></label><br>
             <input type="text" id="username" name="username" required> </input><br>
 
-           <label for="password">Password</label><br>
+           <label for="password"><strong>Password</strong></label><br>
            <input type="password" id="password" name="password" required> </input><br>
         </div>
     </div>
