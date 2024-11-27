@@ -65,15 +65,12 @@ def login():
 
             record = cursor.fetchone()
 
-            #session['username'] = record['username']
-
-            #return "Their details are " + session['username']
-
             if record:
                 if bcrypt.checkpw(password.encode('utf-8'), record['password']):
                     session['username'] = record['username']
                     session['account_type'] = record['account_type']
-                    errorMessage = "got them"
+                    session['logged-in'] = True
+                    errorMessage = "got them, " + str(session['logged-in'])
             return render_template('log-in.html', error=errorMessage)
 
         except:
@@ -82,9 +79,47 @@ def login():
     else:
         return render_template('log-in.html')
 
-@app.route('/sign-up')
+@app.route('/sign-up', methods =['GET', 'POST'])
 def signup():
-    return render_template('sign-up.html')
+    if request.method == 'POST':
+
+        name = request.form['fname']
+        surname = request.form['surname']
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+
+        passhash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        db = get_db()
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        try:
+            cursor.execute("SELECT username, email_address FROM admins WHERE username = ? OR email_address = ? UNION ALL SELECT username, email_address FROM users WHERE username = ? OR email_address = ?", (username, email, username, email))
+            record = cursor.fetchone()
+
+            if record:
+                if record['username'] == username and record['email_address'] == email:
+                    errorMessage = "username and email are in use, sign in to your account"
+                    return render_template('sign-up.html', error=errorMessage)
+                elif record['username'] == username:
+                    errorMessage = "username is in use, please choose another"
+                    return render_template('sign-up.html', error=errorMessage)
+                elif  record['email_address'] == email:
+                    errorMessage = "email is in use, sign in to your account"
+                    return render_template('sign-up.html', error=errorMessage)
+
+
+
+      #      cursor.execute("INSERT INTO users (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'user'))
+
+       #     db.commit()
+
+            return render_template('added-admin-account.html', name = name, surname = surname, username = username, email = email, password = password)
+        except:
+            return render_template('sign-up.html', error="An Error Occured, Account Wasn't Created")
+    else:
+        return render_template('sign-up.html')
 
 @app.route('/add-admin', methods =['GET', 'POST'])
 def addAdmin():

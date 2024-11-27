@@ -2,9 +2,57 @@
 {% block content %}
 <h1 class="text-center">Enter Details Below</h1>
 
+<h3 class="text-center p-3"> {{ error }} </h3>
+
+<form name="sign-up" id="sign-up" action="" method="post">
 
 
+    <div class="d-flex flex-row justify-content-around">
 
+        <div class="d-flex flex-column">
+            <label for="fname">First Name </label><br>
+            <input type="text" id="fname" name="fname" required> </input><br>
+
+           <label for="surname">Surname</label><br>
+           <input type="text" id="surname" name="surname" required> </input><br>
+        </div>
+
+        <div class="d-flex flex-column">
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" required> </input><br>
+
+            <label for="email">Email Address</label><br>
+            <input type="email" id="email" name="email" required> </input><br>
+        </div>
+       
+        <div class="d-flex flex-column">
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" required> </input><br>
+
+            <label for="confirm-password">Confirm Password</label><br>
+            <input type="password" id="confirm-password" name="confirm-password" required> </input><br>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="" class="btn btn-secondary" name="button" onClick="checkPass()" value="sign up">Sign Up</button>
+    </div>
+
+</form>
+
+
+<script>
+const password = (document.getElementById('password').value;
+const confirmPassword = (document.getElementById('confirm-password').value;
+function checkPass() {
+    const password = (document.getElementById('password').value;
+    const confirmPassword = (document.getElementById('confirm-password').value;
+    if (password === confirmPassword) {
+        document.getElementbyID("sign-up").submit();
+    } else {
+        event.preventDefault();
+    }
+}
+</script>
 
 
 
