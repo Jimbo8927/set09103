@@ -71,8 +71,8 @@ def login():
                     session['account_type'] = record['account_type']
                     session['logged-in'] = True
 
-                return redirect(url_for('login'))
-           raise valueError("Log in credentials are incorrect, please check your log in details and try again")
+                    return redirect(url_for('home'))
+            raise valueError("Log in credentials are incorrect, please check your log in details and try again")
 #working on sorting log in so the user is only redirected when logginin correctly
         except:
             errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
