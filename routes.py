@@ -184,19 +184,19 @@ def editDetails():
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
         try:
-            cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? or email = ?) AND admin_id != ? AND account_type != ? UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email = ?) AND user_id != ? AND account_type != ?)", (username, email, id, accountType, username, email, id, accountType))
+            cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? or email_address = ?) AND admin_id != ? AND account_type != ? UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email_address = ?) AND user_id != ? AND account_type != ?", (username, email, id, accountType, username, email, id, accountType))
             record = cursor.fetchone()
-
-           # if record:
-             #   if record['username'] == username and record['email_address'] == email:
-             #       flash("username is in use, please choose another")
-             #       return redirect(url_for('editDetails'))
-             #   elif record['username'] == username:
-             #       flash("username is in use, please choose another")
-             #       return redirect(url_for('editDetails'))
-             #   elif  record['email_address'] == email:
-             #       flash("username is in use, please choose another")
-             #       return redirect(url_for('editDetails'))
+            return str(record) + " " +  str(accountType)
+            if record:
+                if record['username'] == username and record['email_address'] == email:
+                    flash("username and email are in use, please sign in")
+                    return redirect(url_for('editDetails'))
+                elif record['username'] == username:
+                    flash("username is in use, please choose another")
+                    return redirect(url_for('editDetails'))
+                elif  record['email_address'] == email:
+                    flash("Email is in use, please choose another or sign in")
+                    return redirect(url_for('editDetails'))
 
 
 
@@ -206,8 +206,9 @@ def editDetails():
 
             flash("Account updated successfully")
             return redirect(url_for('profile'))
-        except:
-            return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
+        except Exception as e:
+            return str(e)
+           # return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
     else:
         db = get_db()
         db.row_factory = sqlite3.Row
