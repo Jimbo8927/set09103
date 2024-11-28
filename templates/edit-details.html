@@ -1,0 +1,39 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+<h1 class="text-center">Enter Details Below</h1>
+
+<h3 class="text-center p-3"> {{ error }} </h3>
+
+<form name="add-admin-account" action="" method="post">
+
+
+    <div class="d-flex flex-row justify-content-around">
+
+        <div class="d-flex flex-column">
+            <label for="fname">First Name </label><br>
+            <input type="text" id="fname" name="fname" value="{{ fname }}" required> </input><br>
+
+           <label for="surname">Surname</label><br>
+           <input type="text" id="surname" name="surname" value="{{ surname }}" required> </input><br>
+        </div>
+
+        <div class="d-flex flex-column">
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" value="{{ username }}" required> </input><br>
+
+            <label for="email">Email Address</label><br>
+            <input type="email" id="email" name="email" value="{{ email }}" required> </input><br>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-secondary " name="button" value="sign up">Update Details</button>
+    </div>
+
+</form>
+
+
+
+
+
+
+{% endblock %}

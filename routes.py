@@ -81,12 +81,13 @@ def login():
         cursor = db.cursor()
 
         try:
-            cursor.execute("SELECT username, password, account_type FROM admins WHERE username = ? UNION ALL SELECT username, password, account_type FROM users WHERE username = ?", (username, username))
+            cursor.execute("SELECT admin_id AS id, username, password, account_type FROM admins WHERE username = ? UNION ALL SELECT user_id AS id, username, password, account_type FROM users WHERE username = ?", (username, username))
 
             record = cursor.fetchone()
 
             if record:
                 if bcrypt.checkpw(password.encode('utf-8'), record['password']):
+                    session['id'] = record['id']
                     session['username'] = record['username']
                     session['account_type'] = record['account_type']
                     session['logged-in'] = True
@@ -158,16 +159,75 @@ def profile():
         cursor.execute("SELECT first_name, surname, username, email_address FROM admins WHERE username = ? UNION ALL SELECT first_name, surname, username, email_address FROM users WHERE username = ?", (username, username))
         record = cursor.fetchone()
 
+        if record is None:
+            raise valueError("no details were retrieved")
 
-        return render_template('profile.html', fname := record['first_name'], surname := record['surname'], username := record['username', email := record['email_address']])
+        return render_template('profile.html', fname = record['first_name'], surname = record['surname'], username = record['username'], email = record['email_address'])
     except:
         flash("Sorry couldn't retrieve your details at this time, try again later")
         return redirect(url_for('home'))
 
-@app.route('/edit-account-details')
+@app.route('/profile/edit-account-details', methods =['GET', 'POST'])
 @requires_login
 def editDetails():
-    return redirect(url_for('home'))
+    if request.method == 'POST':
+
+        id = session['id']
+        sessionUsername = session['username']
+        accoutType = session['account_type']
+        name = request.form['fname']
+        surname = request.form['surname']
+        username = request.form['username']
+        email = request.form['email']
+
+        db = get_db()
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        try:
+            cursor.execute("SELECT username, email_address FROM admins WHERE username = ? AND admin_id != ? AND account_type != ?  OR email_address = ? AND admin_id != ? AND account_type != ? UNION ALL SELECT username, email_address FROM users WHERE username = ? AND user_id != ? AND account_type != ? OR email_address = ? AND user_id != ? AND account_type != ?", (username, id, accountType, email, id, accountType, username, id, accountType, email, id, accountType))
+            record = cursor.fetchone()
+
+            if record:
+                if record['username'] == username and record['email_address'] == email:
+                    errorMessage = "username and email are in use, sign in to your account"
+                   # return render_template('edit-details.html', error=errorMessage)
+                    return redirect(url_for('home'))
+                elif record['username'] == username:
+                    errorMessage = "username is in use, please choose another"
+                    return redirect(url_for('home'))
+                   # return render_template('edit-details.html', error=errorMessage)
+                elif  record['email_address'] == email:
+                    errorMessage = "email is in use, sign in to your account"
+                    return redirect(url_for('home'))
+                   # return render_template('edit-details.html', error=errorMessage)
+
+
+
+            cursor.execute("UPDATE users SET first_name = ?, surname = ?, email_address = ?, username = ? WHERE username = ?", (name, surname, email, username, sessionUsername))
+            session['username'] = username
+            db.commit()
+
+            flash("Account updated successfully")
+            return redirect(url_for('profile'))
+        except:
+            return render_template('profile.html', error="An Error Occured, Account Wasn't Updated")
+    else:
+        db = get_db()
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+
+        try:
+            username = session['username']
+            cursor.execute("SELECT first_name, surname, username, email_address FROM admins WHERE username = ? UNION ALL SELECT first_name, surname, username, email_address FROM users WHERE username = ?", (username, username))
+            record = cursor.fetchone()
+
+            if record is None:
+                raise valueError("no details were retrieved")
+
+            return render_template('edit-details.html', fname = record['first_name'], surname = record['surname'], username = record['username'], email = record['email_address'])
+        except:
+            flash("Sorry couldn't display this page at this time, please try again later")
+            return redirect(url_for('profile'))
 
 @app.route('/add-admin', methods =['GET', 'POST'])
 @requires_admin
