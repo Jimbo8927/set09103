@@ -1,5 +1,4 @@
 from flask import Flask, render_template, g, session, request, url_for, redirect, flash
-from functools import wraps
 import sqlite3, configparser, secrets, bcrypt
 
 app = Flask(__name__)
@@ -46,25 +45,6 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
-def requires_login(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        status = session.get('logged-in', False)
-        if not status:
-            flash("Please log in to view this page")
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated
-
-def requires_admin(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if 'account_type' not in session or session['account_type'] != 'admin':
-            flash("You don't have permission to view this page")
-            return redirect(url_for('home'))
-        return f(*args, **kwargs)
-    return decorated
-
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -92,7 +72,7 @@ def login():
                     session['logged-in'] = True
 
                     return redirect(url_for('home'))
-            raise valueError("Wrong credentials")
+            raise valueError("Log in credentials are incorrect, please check your log in details and try again")
 
         except:
             errorMessage = "Log in credentials are incorrect, please check your log in details and try again"
@@ -147,30 +127,7 @@ def signup():
     else:
         return render_template('sign-up.html')
 
-@app.route('/profile')
-@requires_login
-def profile():
-    db = get_db()
-    db.row_factory = sqlite3.Row
-    cursor = db.cursor()
-    try:
-        username = session['username']
-        cursor.execute("SELECT first_name, surname, username, email_address FROM admins WHERE username = ? UNION ALL SELECT first_name, surname, username, email_address FROM users WHERE username = ?", (username, username))
-        record = cursor.fetchone()
-
-
-        return render_template('profile.html', fname := record['first_name'], surname := record['surname'], username := record['username', email := record['email_address']])
-    except:
-        flash("Sorry couldn't retrieve your details at this time, try again later")
-        return redirect(url_for('home'))
-
-@app.route('/edit-account-details')
-@requires_login
-def editDetails():
-    return redirect(url_for('home'))
-
 @app.route('/add-admin', methods =['GET', 'POST'])
-@requires_admin
 def addAdmin():
     if request.method == 'POST':
 

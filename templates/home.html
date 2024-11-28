@@ -1,6 +1,18 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
-<h1 class="text-center">Welcome to Quizzle</h1>
+{% if 'username' in session %}
+    <h1 class="text-center">Welcome {{ session['username'] }}</h1>
+{% else %}
+    <h1 class="text-center">Welcome to Quizzle</h1>
+{% endif %}
+{% with messages = get_flashed_messages()  %}
+    {% if messages %}
+        {% for message in messages %}
+            <p class="text-center p-3"><strong>{{ message }}</strong></p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 
 <p></p>
 
