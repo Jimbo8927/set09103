@@ -11,6 +11,14 @@
 
 	{% include 'navbar.html'  %}
 
+        {% with messages = get_flashed_messages()  %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="text-center p-3"><strong>{{ message }}</strong></p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+ 
 	{% block content %} {% endblock %}
 
 

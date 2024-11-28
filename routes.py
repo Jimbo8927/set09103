@@ -174,7 +174,7 @@ def editDetails():
 
         id = session['id']
         sessionUsername = session['username']
-        accoutType = session['account_type']
+        accountType = session['account_type']
         name = request.form['fname']
         surname = request.form['surname']
         username = request.form['username']
@@ -184,33 +184,30 @@ def editDetails():
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
         try:
-            cursor.execute("SELECT username, email_address FROM admins WHERE username = ? AND admin_id != ? AND account_type != ?  OR email_address = ? AND admin_id != ? AND account_type != ? UNION ALL SELECT username, email_address FROM users WHERE username = ? AND user_id != ? AND account_type != ? OR email_address = ? AND user_id != ? AND account_type != ?", (username, id, accountType, email, id, accountType, username, id, accountType, email, id, accountType))
+            cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? or email = ?) AND admin_id != ? AND account_type != ? UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email = ?) AND user_id != ? AND account_type != ?)", (username, email, id, accountType, username, email, id, accountType))
             record = cursor.fetchone()
 
-            if record:
-                if record['username'] == username and record['email_address'] == email:
-                    errorMessage = "username and email are in use, sign in to your account"
-                   # return render_template('edit-details.html', error=errorMessage)
-                    return redirect(url_for('home'))
-                elif record['username'] == username:
-                    errorMessage = "username is in use, please choose another"
-                    return redirect(url_for('home'))
-                   # return render_template('edit-details.html', error=errorMessage)
-                elif  record['email_address'] == email:
-                    errorMessage = "email is in use, sign in to your account"
-                    return redirect(url_for('home'))
-                   # return render_template('edit-details.html', error=errorMessage)
+           # if record:
+             #   if record['username'] == username and record['email_address'] == email:
+             #       flash("username is in use, please choose another")
+             #       return redirect(url_for('editDetails'))
+             #   elif record['username'] == username:
+             #       flash("username is in use, please choose another")
+             #       return redirect(url_for('editDetails'))
+             #   elif  record['email_address'] == email:
+             #       flash("username is in use, please choose another")
+             #       return redirect(url_for('editDetails'))
 
 
 
-            cursor.execute("UPDATE users SET first_name = ?, surname = ?, email_address = ?, username = ? WHERE username = ?", (name, surname, email, username, sessionUsername))
-            session['username'] = username
-            db.commit()
+            #cursor.execute("UPDATE users SET first_name = ?, surname = ?, email_address = ?, username = ? WHERE username = ?", (name, surname, email, username, sessionUsername))
+            #session['username'] = username
+            #db.commit()
 
             flash("Account updated successfully")
             return redirect(url_for('profile'))
         except:
-            return render_template('profile.html', error="An Error Occured, Account Wasn't Updated")
+            return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
     else:
         db = get_db()
         db.row_factory = sqlite3.Row
