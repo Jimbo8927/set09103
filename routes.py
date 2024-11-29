@@ -184,9 +184,10 @@ def editDetails():
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
         try:
-            cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? or email_address = ?) AND admin_id != ? AND account_type != ? UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email_address = ?) AND user_id != ? AND account_type != ?", (username, email, id, accountType, username, email, id, accountType))
+            cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? OR email_address = ?) AND NOT (admin_id = ? AND account_type = ?) UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email_address = ?) AND NOT (user_id = ? AND account_type = ?)", (username, email, id, accountType, username, email,  id, accountType))
+           # cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? or email_address = ?) AND admin_id != ? UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email_address = ?) AND user_id != ?", (username, email, id, username, email, id))
             record = cursor.fetchone()
-            return str(record) + " " +  str(accountType)
+           # return str(record['username']) + " " +  str(accountType)
             if record:
                 if record['username'] == username and record['email_address'] == email:
                     flash("username and email are in use, please sign in")
@@ -195,20 +196,20 @@ def editDetails():
                     flash("username is in use, please choose another")
                     return redirect(url_for('editDetails'))
                 elif  record['email_address'] == email:
-                    flash("Email is in use, please choose another or sign in")
+                    flash("Email is in use, please choose another")
                     return redirect(url_for('editDetails'))
 
 
 
-            #cursor.execute("UPDATE users SET first_name = ?, surname = ?, email_address = ?, username = ? WHERE username = ?", (name, surname, email, username, sessionUsername))
-            #session['username'] = username
-            #db.commit()
+           # cursor.execute("UPDATE users SET first_name = ?, surname = ?, email_address = ?, username = ? WHERE username = ?", (name, surname, email, username, sessionUsername))
+           # session['username'] = username
+           # db.commit()
 
             flash("Account updated successfully")
             return redirect(url_for('profile'))
         except Exception as e:
-            return str(e)
-           # return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
+           return str(e)
+          # return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
     else:
         db = get_db()
         db.row_factory = sqlite3.Row
@@ -270,7 +271,16 @@ def addAdmin():
     else:
         return render_template('add-admin.html')
 
+@app.route('/delete-account', methods =['GET','POST'])
+@requires_login
+def deleteAccount():
+    if request.method == 'POST':
+        return "placeholder"
+    else:
+        return render_template('delete-account.html')
+
 @app.route('/config')
+@requires_admin
 def config():
     s = []
     s.append('debug: '+str(app.config['DEBUG']))
