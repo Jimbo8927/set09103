@@ -1,9 +1,14 @@
+# imports flask and libraries
 from flask import Flask, render_template, g, session, request, url_for, redirect, flash
+# imports wraps from functools
 from functools import wraps
+# imports sqlite3, configparser, secrets and bcrypt
 import sqlite3, configparser, secrets, bcrypt
 
 app = Flask(__name__)
 
+# initialises app by reading values from the configuration file
+# displays error message if all values cannot be read in
 def init(app):
     config = configparser.ConfigParser()
     try:
@@ -20,12 +25,14 @@ def init(app):
     except:
         print("Cound not read configs from: ", config_location)
 
+# calls the above init function
 init(app)
 
-print(app.secret_key)
+print(app.secret_key) # remove after changing key ----------------
 
-db_location = 'var/quizzle.db'
+db_location = 'var/quizzle.db' # posibly remove and test with using config file input instead -----------
 
+# connects to the database for quizzle using the db_locaton variable
 def get_db():
     db = getattr(g, 'db', None)
     if db is None:
@@ -33,12 +40,15 @@ def get_db():
         g.db = db
     return db
 
+# decorator calls function automatically, doesn't need called
+# closes the connection to the database
 @app.teardown_appcontext
 def close_db_connection(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
 
+# Initialises database when called based on the schema withing the .sql file
 def init_db():
     with app.app_context():
         db = get_db()
@@ -46,6 +56,9 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
+# decorator function requires log_login, checks if the user is logged in
+# if the user is logged in the original function is called
+# if the user is not logged in the user is redirected to the log in page, and asked to log in
 def requires_login(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -56,6 +69,10 @@ def requires_login(f):
         return f(*args, **kwargs)
     return decorated
 
+# decorator function requires requires_admin, checks if the user is an admin
+# if the user is an admin the original function is called
+# if the user is not an admin the user is redirected to the home page, and
+# instructed they do not have permission to view this page
 def requires_admin(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -65,10 +82,15 @@ def requires_admin(f):
         return f(*args, **kwargs)
     return decorated
 
+# home/default route, navigates here unless another path is specified
 @app.route('/')
 def home():
     return render_template('home.html')
 
+# login - makes use of post and get methods
+# login returns the log-in.html file to be diaplsyed to the user
+# When a user attempts to login a post request is made, the username and password input in the log in form is used to check for a match in the database where both username and password match
+# If there is a match session variabes are set accordingly and the user is navigated to the home page.
 @app.route('/log-in', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -80,8 +102,19 @@ def login():
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
 
+        query = """
+                SELECT admin_id AS id, username, password, account_type
+                FROM admins
+                WHERE username = ?
+                UNION ALL
+                SELECT user_id AS id, username, password, account_type
+                FROM users
+                WHERE username = ?
+
+                """
+
         try:
-            cursor.execute("SELECT admin_id AS id, username, password, account_type FROM admins WHERE username = ? UNION ALL SELECT user_id AS id, username, password, account_type FROM users WHERE username = ?", (username, username))
+            cursor.execute(query, (username, username))
 
             record = cursor.fetchone()
 
@@ -101,11 +134,17 @@ def login():
     else:
         return render_template('log-in.html')
 
+# logout
+# log out clears session variables and return the user to the log in screen
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# sign up, makes use of GET and POST methods
+# sign up returns the sign-up.html page to the user, contains error message if the user tries to make an account and an error occurs
+# Takes the information submitted in the sign-up form and creates a new user account, password is hashed using bcrypt before being stored
+# before creating an account a check is made to ensure that the username or email address isn't linked to another account
 @app.route('/sign-up', methods =['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -121,8 +160,18 @@ def signup():
         db = get_db()
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
+
+        checkQuery = """
+                SELECT username, email_address
+                FROM admins
+                WHERE username = ? OR email_address = ?
+                UNION ALL SELECT username, email_address
+                FROM users
+                WHERE username = ? OR email_address = ?
+                """
+
         try:
-            cursor.execute("SELECT username, email_address FROM admins WHERE username = ? OR email_address = ? UNION ALL SELECT username, email_address FROM users WHERE username = ? OR email_address = ?", (username, email, username, email))
+            cursor.execute(checkQuery, (username, email, username, email))
             record = cursor.fetchone()
 
             if record:
@@ -136,9 +185,13 @@ def signup():
                     errorMessage = "email is in use, sign in to your account"
                     return render_template('sign-up.html', error=errorMessage)
 
+            insertQuery = """
+                          INSERT INTO users (first_name, surname, email_address, username, password, account_type)
+                          VALUES (?, ?, ?, ?, ?, ?)
 
+                          """
 
-            cursor.execute("INSERT INTO users (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'user'))
+            cursor.execute(insertQuery, (name, surname, email, username, passhash, 'user'))
 
             db.commit()
             flash("Account created successfully, please log in")
@@ -148,6 +201,11 @@ def signup():
     else:
         return render_template('sign-up.html')
 
+# profile, uses the GET method
+# returns the profile.html to display the current users details
+# using session username to select the correct user
+# return an error if the users details are not retrieved
+# uses decorator fuction requires_login to ensure a user is logged in before attempting to retrieve details
 @app.route('/profile')
 @requires_login
 def profile():
@@ -156,7 +214,14 @@ def profile():
     cursor = db.cursor()
     try:
         username = session['username']
-        cursor.execute("SELECT first_name, surname, username, email_address FROM admins WHERE username = ? UNION ALL SELECT first_name, surname, username, email_address FROM users WHERE username = ?", (username, username))
+
+        query = """
+                SELECT first_name, surname, username, email_address
+                FROM admins WHERE username = ?
+                UNION ALL SELECT first_name, surname, username, email_address
+                FROM users WHERE username = ?
+                """
+        cursor.execute(query, (username, username))
         record = cursor.fetchone()
 
         if record is None:
@@ -167,6 +232,11 @@ def profile():
         flash("Sorry couldn't retrieve your details at this time, try again later")
         return redirect(url_for('home'))
 
+# edit details, makes use of GET and POST methods
+# retrieves the users details from the database and sends them to the edit page
+# when a user attempts to update their details, the data from the form submission is retrieved and used to update the users data within the database then returns the user to the profile page
+# before updating the users account a check is made to ensure that the username or email address isn't linked to another account
+# uses decorator fuction requires_login to ensure a user is logged in before attempting to retrieve details
 @app.route('/profile/edit-account-details', methods =['GET', 'POST'])
 @requires_login
 def editDetails():
@@ -183,11 +253,20 @@ def editDetails():
         db = get_db()
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
+
         try:
-            cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? OR email_address = ?) AND NOT (admin_id = ? AND account_type = ?) UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email_address = ?) AND NOT (user_id = ? AND account_type = ?)", (username, email, id, accountType, username, email,  id, accountType))
-           # cursor.execute("SELECT username, email_address FROM admins WHERE (username = ? or email_address = ?) AND admin_id != ? UNION ALL SELECT username, email_address FROM users WHERE (username = ? OR email_address = ?) AND user_id != ?", (username, email, id, username, email, id))
+            checkQuery = """
+                         SELECT username, email_address
+                         FROM admins
+                         WHERE (username = ? OR email_address = ?) AND NOT (admin_id = ? AND account_type = ?)
+                         UNION ALL
+                         SELECT username, email_address
+                         FROM users
+                         WHERE (username = ? OR email_address = ?) AND NOT (user_id = ? AND account_type = ?)
+                         """
+            cursor.execute(checkQuery, (username, email, id, accountType, username, email,  id, accountType))
             record = cursor.fetchone()
-           # return str(record['username']) + " " +  str(accountType)
+
             if record:
                 if record['username'] == username and record['email_address'] == email:
                     flash("username and email are in use, please sign in")
@@ -199,17 +278,20 @@ def editDetails():
                     flash("Email is in use, please choose another")
                     return redirect(url_for('editDetails'))
 
+            updateQuery = """
+                          UPDATE users
+                          SET first_name = ?, surname = ?, email_address = ?, username = ?
+                          WHERE username = ?
+                          """
 
-
-           # cursor.execute("UPDATE users SET first_name = ?, surname = ?, email_address = ?, username = ? WHERE username = ?", (name, surname, email, username, sessionUsername))
-           # session['username'] = username
-           # db.commit()
+            cursor.execute(updateQuery, (name, surname, email, username, sessionUsername))
+            db.commit()
+            session['username'] = username
 
             flash("Account updated successfully")
             return redirect(url_for('profile'))
         except Exception as e:
-           return str(e)
-          # return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
+           return render_template('home.html', error="An Error Occured, Account Wasn't Updated")
     else:
         db = get_db()
         db.row_factory = sqlite3.Row
@@ -217,7 +299,18 @@ def editDetails():
 
         try:
             username = session['username']
-            cursor.execute("SELECT first_name, surname, username, email_address FROM admins WHERE username = ? UNION ALL SELECT first_name, surname, username, email_address FROM users WHERE username = ?", (username, username))
+
+            detailsQuery = """
+                           SELECT first_name, surname, username, email_address
+                           FROM admins
+                           WHERE username = ?
+                           UNION ALL
+                           SELECT first_name, surname, username, email_address
+                           FROM users
+                           WHERE username = ?
+                           """
+
+            cursor.execute(detailsQuery, (username, username))
             record = cursor.fetchone()
 
             if record is None:
@@ -228,6 +321,9 @@ def editDetails():
             flash("Sorry couldn't display this page at this time, please try again later")
             return redirect(url_for('profile'))
 
+# add-admin creates an admin account, makes use of GET and POST methods
+# 
+# uses decorator fuction requires_admin to ensure an admin is logged in before attempting to retrieve details
 @app.route('/add-admin', methods =['GET', 'POST'])
 @requires_admin
 def addAdmin():
