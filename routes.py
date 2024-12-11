@@ -321,9 +321,12 @@ def editDetails():
             flash("Sorry couldn't display this page at this time, please try again later")
             return redirect(url_for('profile'))
 
-# add-admin creates an admin account, makes use of GET and POST methods
-# 
-# uses decorator fuction requires_admin to ensure an admin is logged in before attempting to retrieve details
+# add-admin allows an admin to create an admin account, makes use of GET and POST methods
+# returns the add-admin.html page, if an admin tries to make an admin account, a check is made to ensure the username or email isn't in use by another account
+# upon account creation the admin is redirected to a page that displays the details of the newly created account, including the password which is only ever seen or accessible from this page
+# uses secrets.token_urlsafe to generate a new random password for the admin account
+# uses bcrypt to hash the password before storing it
+# uses decorator fuction requires_admin to ensure an admin is logged in before allowing the admin to create another admin account
 @app.route('/add-admin', methods =['GET', 'POST'])
 @requires_admin
 def addAdmin():
@@ -341,7 +344,17 @@ def addAdmin():
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
         try:
-            cursor.execute("SELECT username, email_address FROM admins WHERE username = ? OR email_address = ? UNION ALL SELECT username, email_address FROM users WHERE username = ? OR email_address = ?", (username, email, username, email))
+
+            checkQuery = """
+                         SELECT username, email_address
+                         FROM admins
+                         WHERE username = ? OR email_address = ?
+                         UNION ALL
+                         SELECT username, email_address
+                         FROM users
+                         WHERE username = ? OR email_address = ?
+                         """
+            cursor.execute(checkQuery, (username, email, username, email))
             record = cursor.fetchone()
 
             if record:
@@ -355,9 +368,12 @@ def addAdmin():
                     errorMessage = "email is in use, sign in to your account"
                     return render_template('add-admin.html', error=errorMessage)
 
+            insertQuery = """
+                          INSERT INTO admins (first_name, surname, email_address, username, password, account_type) 
+                          VALUES (?, ?, ?, ?, ?, ?)
+                          """
 
-
-            cursor.execute("INSERT INTO admins (first_name, surname, email_address, username, password, account_type) VALUES (?, ?, ?, ?, ?, ?)", (name, surname, email, username, passhash, 'admin'))
+            cursor.execute(insertQuery, (name, surname, email, username, passhash, 'admin'))
 
             db.commit()
 
@@ -367,14 +383,96 @@ def addAdmin():
     else:
         return render_template('add-admin.html')
 
+#delete personal account
 @app.route('/delete-account', methods =['GET','POST'])
 @requires_login
 def deleteAccount():
+    if request.method == 'POST':
+
+        id = session['id']
+
+        db = get_db()
+        cursor = db.cursor()
+
+        if session['account_type'] and session['account_type'] == 'user':
+            deleteQuery = """
+                          DELETE FROM users
+                          WHERE user_id = ?
+                          """
+        elif session['account_type'] and session['account_type'] == 'admin':
+            deleteQuery = """
+                          DELETE FROM admins
+                          WHERE admin_id = ?
+                          """
+        else:
+           raise valueError("account type invalid")
+
+        cursor.execute(deleteQuery, (id,))
+        db.commit()
+
+        session.clear()
+
+        flash('account deleted')
+        return redirect(url_for('home'))
+    else:
+        return render_template('delete-account.html')
+#rename ------------------------------------------------------------------
+#delete account as admin
+@app.route('/delete-account', methods =['GET','POST'])
+@requires_admin
+def deleteAccountAsAdmin():
     if request.method == 'POST':
         return "placeholder"
     else:
         return render_template('delete-account.html')
 
+# list users - returns list-user.html with a list of users to the admin
+# uses decorator fuction requires_admin to ensure an admin is logged in before listing users
+@app.route('/list-users') 
+@requires_admin
+def listUser():
+    db = get_db()
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    try:
+        listQuery = """
+                    SELECT first_name, surname, username, email_address
+                    FROM users
+                    """
+        cursor.execute(listQuery)
+        record = cursor.fetchall()
+
+        return render_template('list-users.html', users = record)
+    except:
+        flash("Couldn't retrieve user data")
+        return redirect(url_for('home'))
+
+# list admins - returns list-user.html with a list of admins to the admin
+# uses decorator fuction requires_admin to ensure an admin is logged in before listing users
+@app.route('/list-admin')
+@requires_admin
+def listAdmin():
+    db = get_db()
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    try:
+        listQuery = """
+                    SELECT first_name, surname, username, email_address
+                    FROM admins
+                    """
+        cursor.execute(listQuery)
+        record = cursor.fetchall()
+
+        return render_template('list-users.html', users = record)
+    except:
+        flash("Couldn't retrieve user data")
+        return redirect(url_for('home'))
+
+
+# print config information to the user
+# uses decorator fuction requires_admin to ensure an admin is logged in before displaying information
 @app.route('/config')
 @requires_admin
 def config():
