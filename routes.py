@@ -321,6 +321,40 @@ def editDetails():
             flash("Sorry couldn't display this page at this time, please try again later")
             return redirect(url_for('profile'))
 
+# edit password user
+@app.route('/profile/edit-account-details/editpassword', methods =['GET', 'POST'])
+@requires_login
+def editPasswordU():
+    if request.method == 'POST':
+
+        password = request.form['password']
+        #username here
+        passhash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        db = get_db()
+        cursor = db.cursor()
+
+        updateQuery = """
+                          UPDATE users
+                          SET password = ?
+                          WHERE username = ?
+                          """
+
+            cursor.execute(updateQuery, (passHash, username))
+            db.commit()
+    else:
+        return render_template('pass-update-u.html')
+
+# edit password admin
+@app.route('/profile/edit-account-details/updatePassword', methods =['GET', 'POST'])
+@requires_login
+def editPasswordA():
+    if request.method == 'POST':
+        return "placeholder"
+    else:
+        return render_template('pass-update-a.html')
+
+
 # add-admin allows an admin to create an admin account, makes use of GET and POST methods
 # returns the add-admin.html page, if an admin tries to make an admin account, a check is made to ensure the username or email isn't in use by another account
 # upon account creation the admin is redirected to a page that displays the details of the newly created account, including the password which is only ever seen or accessible from this page

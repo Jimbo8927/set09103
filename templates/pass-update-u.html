@@ -1,7 +1,36 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+<h3 class="text-center">Update Password Below, alternativley click cancel to return</h3>
+
+<h5 class="text-center p-3"> {{ error }} </h5>
+
+<div class="text-center p-3 text-danger">
+   <strong><label id="errorMessage"></label></strong>
+</div>
+
+<form name="sign-up" id="sign-up" action="" method="post">
 
 
+    <div class="d-flex flex-row justify-content-around">
+
+        <div class="d-flex flex-column">
+            <label for="password"><strong>Password</strong></label><br>
+            <input type="password" id="password" name="password" required> </input><br>
+
+            <label for="confirm-password"><strong>Confirm Password</strong></label><br>
+            <input type="password" id="confirm-password" name="confirm-password" required> </input><br>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="button" class="btn btn-secondary" name="button" onClick="checkPass(event)" value="sign up">Update Password</button>
+    </div>
+
+</form>
+
+<div class="text-center">
+    <a href="/"></a>
+</div>
 
 
 {% endblock %}
