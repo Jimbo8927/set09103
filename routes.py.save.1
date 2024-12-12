@@ -417,50 +417,18 @@ def deleteAccount():
     else:
         return render_template('delete-account.html')
 #rename ------------------------------------------------------------------
-#delete account as admin
-@app.route('/delete-account-asAdmin', methods =['GET','POST'])
+# delete use/admin account as admin
+@app.route('/delete-account', methods =['GET','POST'])
 @requires_admin
 def deleteAccountAsAdmin():
     if request.method == 'POST':
-
-#        username = request.form['username']
- #       accType = request.form['accType']
-
-        db = get_db()
-        cursor = db.cursor()
-
-        if accType and accType == 'user':
-            deleteQuery = """
-                          DELETE FROM users
-                          WHERE username = ?
-                          """
-        elif accType and accType == 'admin':
-            deleteQuery = """
-                          DELETE FROM admins
-                          WHERE username = ?
-                          """
-        else:
-           raise valueError("account type invalid")
-
-        cursor.execute(deleteQuery, (username,))
-       # db.commit()
-
-        session.clear()
-
-        flash('account deleted')
-
-        if accType and accType == 'user':
-            return redirect(url_for('listUser'))
-        elif accType and accType == 'admin':
-            return redirect(url_for('listAdmin'))
+        return "placeholder"
     else:
-        username = request.form['username']
-        accType = request.form['accType']
         return render_template('delete-account.html')
 
 # list users - returns list-user.html with a list of users to the admin
 # uses decorator fuction requires_admin to ensure an admin is logged in before listing users
-@app.route('/list-users')
+@app.route('/list-users') 
 @requires_admin
 def listUser():
     db = get_db()
@@ -469,7 +437,7 @@ def listUser():
 
     try:
         listQuery = """
-                    SELECT first_name, surname, username, email_address, account_type
+                    SELECT first_name, surname, username, email_address
                     FROM users
                     """
         cursor.execute(listQuery)
@@ -491,7 +459,7 @@ def listAdmin():
 
     try:
         listQuery = """
-                    SELECT first_name, surname, username, email_address, account_type
+                    SELECT first_name, surname, username, email_address
                     FROM admins
                     """
         cursor.execute(listQuery)
