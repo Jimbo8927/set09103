@@ -4,15 +4,6 @@
     <h5 class="text-center">{{ session['username'] }}</h5>
 {% endif %}
 
-{% with messages = get_flashed_messages()  %}
-    {% if messages %}
-        {% for message in messages %}
-            <p class="text-center p-3"><strong>{{ message }}</strong></p>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-
 <div class="d-flex flex-row justify-content-around">
 
     <div class="d-flex flex-column">

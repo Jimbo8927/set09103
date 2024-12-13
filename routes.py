@@ -321,20 +321,24 @@ def editDetails():
             flash("Sorry couldn't display this page at this time, please try again later")
             return redirect(url_for('profile'))
 
-# edit password user
-@app.route('/profile/edit-account-details/editpassword', methods =['GET', 'POST'])
+# edit password user - allows a user to change their password, uses POST and GET methods
+# returns the pass-update-a upon initial load of the route
+# password is hashed using bcrypt before being stored
+# message is flashed indicationg whether the password is updated or not, and user is returned to thier profile page
+@app.route('/profile/edit-account-details/edit-password', methods =['GET', 'POST'])
 @requires_login
 def editPasswordU():
     if request.method == 'POST':
 
-        password = request.form['password']
-        #username here
-        passhash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        try:
+            password = request.form['password']
+            username = session['username']
+            passHash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        db = get_db()
-        cursor = db.cursor()
+            db = get_db()
+            cursor = db.cursor()
 
-        updateQuery = """
+            updateQuery = """
                           UPDATE users
                           SET password = ?
                           WHERE username = ?
@@ -342,15 +346,47 @@ def editPasswordU():
 
             cursor.execute(updateQuery, (passHash, username))
             db.commit()
+
+            flash("Password updated sucsessfully")
+            return redirect(url_for('profile'))
+        except:
+            flash("Password couldn't be updated at this time, please try again later")
+            return redirect(url_for('profile'))
     else:
         return render_template('pass-update-u.html')
 
-# edit password admin
-@app.route('/profile/edit-account-details/updatePassword', methods =['GET', 'POST'])
+# edit password admin - allows admin to change their password, uses POST and GET methods
+# returns the pass-update-u upon initial load of the route
+# password is hashed using bcrypt before being stored
+# message is flashed and user is returned to thier profile page if the password can't be changed and updated successfully
+# otherwise they are directed to a new page to view their new password.
+@app.route('/profile/edit-account-details/update-password', methods =['GET', 'POST'])
 @requires_login
+@requires_admin
 def editPasswordA():
     if request.method == 'POST':
-        return "placeholder"
+
+        try:
+            password = secrets.token_urlsafe(8)
+            username = session['username']
+            passHash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+            db = get_db()
+            cursor = db.cursor()
+
+            updateQuery = """
+                          UPDATE admins
+                          SET password = ?
+                          WHERE username = ?
+                          """
+
+            cursor.execute(updateQuery, (passHash, username))
+            db.commit()
+
+            return render_template('passUpdated.html', passMessage1="Password updated successfully, ensure you have taken not of your new password", passMessage2="Your New Password is: " + password)
+        except:
+            flash("Password couldn't be updated at this time, please try again later")
+            return redirect(url_for('profile'))
     else:
         return render_template('pass-update-a.html')
 
@@ -417,37 +453,43 @@ def addAdmin():
     else:
         return render_template('add-admin.html')
 
-#delete personal account
+# delete personal account, uses GET and POST methods
+# allows users and admins to delete their accounts
 @app.route('/delete-account', methods =['GET','POST'])
 @requires_login
 def deleteAccount():
     if request.method == 'POST':
 
-        id = session['id']
+        try:
 
-        db = get_db()
-        cursor = db.cursor()
+            id = session['id']
 
-        if session['account_type'] and session['account_type'] == 'user':
-            deleteQuery = """
-                          DELETE FROM users
-                          WHERE user_id = ?
-                          """
-        elif session['account_type'] and session['account_type'] == 'admin':
-            deleteQuery = """
-                          DELETE FROM admins
-                          WHERE admin_id = ?
-                          """
-        else:
-           raise valueError("account type invalid")
+            db = get_db()
+            cursor = db.cursor()
 
-        cursor.execute(deleteQuery, (id,))
-        db.commit()
+            if session['account_type'] and session['account_type'] == 'user':
+                deleteQuery = """
+                              DELETE FROM users
+                              WHERE user_id = ?
+                              """
+            elif session['account_type'] and session['account_type'] == 'admin':
+                deleteQuery = """
+                              DELETE FROM admins
+                              WHERE admin_id = ?
+                              """
+            else:
+                raise valueError("account type invalid")
 
-        session.clear()
+            cursor.execute(deleteQuery, (id,))
+            db.commit()
 
-        flash('account deleted')
-        return redirect(url_for('home'))
+            session.clear()
+
+            flash('account deleted')
+            return redirect(url_for('home'))
+        except:
+            flash("account couldn't be deleted at this time")
+            return redirect(url_for('home'))
     else:
         return render_template('delete-account.html')
 #rename ------------------------------------------------------------------
@@ -457,8 +499,8 @@ def deleteAccount():
 def deleteAccountAsAdmin():
     if request.method == 'POST':
 
-#        username = request.form['username']
- #       accType = request.form['accType']
+        username = request.args.get('username')
+        accType = request.args.get('accType')
 
         db = get_db()
         cursor = db.cursor()
@@ -477,9 +519,7 @@ def deleteAccountAsAdmin():
            raise valueError("account type invalid")
 
         cursor.execute(deleteQuery, (username,))
-       # db.commit()
-
-        session.clear()
+        db.commit()
 
         flash('account deleted')
 
@@ -488,31 +528,38 @@ def deleteAccountAsAdmin():
         elif accType and accType == 'admin':
             return redirect(url_for('listAdmin'))
     else:
-        username = request.form['username']
-        accType = request.form['accType']
+
         return render_template('delete-account.html')
 
 # list users - returns list-user.html with a list of users to the admin
 # uses decorator fuction requires_admin to ensure an admin is logged in before listing users
-@app.route('/list-users')
+@app.route('/list-users', methods =['GET','POST'])
 @requires_admin
 def listUser():
-    db = get_db()
-    db.row_factory = sqlite3.Row
-    cursor = db.cursor()
+    if request.method == 'POST':
 
-    try:
-        listQuery = """
-                    SELECT first_name, surname, username, email_address, account_type
-                    FROM users
-                    """
-        cursor.execute(listQuery)
-        record = cursor.fetchall()
+        username = request.form['username']
+        accType = request.form['accType']
 
-        return render_template('list-users.html', users = record)
-    except:
-        flash("Couldn't retrieve user data")
-        return redirect(url_for('home'))
+        return redirect(url_for('deleteAccountAsAdmin', username = username, accType = accType))
+
+    else:
+        db = get_db()
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+
+        try:
+            listQuery = """
+                        SELECT first_name, surname, username, email_address, account_type
+                        FROM users
+                        """
+            cursor.execute(listQuery)
+            record = cursor.fetchall()
+
+            return render_template('list-users.html', users = record)
+        except:
+            flash("Couldn't retrieve user data")
+            return redirect(url_for('home'))
 
 # list admins - returns list-user.html with a list of admins to the admin
 # uses decorator fuction requires_admin to ensure an admin is logged in before listing users

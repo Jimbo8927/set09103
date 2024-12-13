@@ -3,6 +3,15 @@
 <h1 class="text-center">Edit Details Below</h1>
 
 <h3 class="text-center p-3"> {{ error }} </h3>
+{% if 'account_type in session' and session['account_type'] == 'user' %}
+<div class="text-end px-3">
+    <a href="/profile/edit-account-details/edit-password"> <button type="submit" class="btn btn-secondary">Change Password</button></a>
+</div>
+{% elif 'account_type in session' and session['account_type'] == 'admin' %}
+<div class="text-end px-3">
+    <a href="/profile/edit-account-details/update-password"> <button type="submit" class="btn btn-secondary">Change Password</button></a>
+</div>
+{% endif %}
 
 <form name="add-admin-account" action="" method="post">
 
