@@ -9,7 +9,13 @@
             <button type="submit" class="btn btn-secondary">Delete Account</button>
         </form>
 
-        <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
+        {% if delUsername and delAccType == 'user' %}
+            <a href="/list-users"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
+        {% elif delUsername and delAccType == 'admin' %}
+            <a href="/list-admin"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
+        {% else %}
+            <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
+        {% endif%}
     </div>
 
 {% endblock %}

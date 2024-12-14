@@ -1,0 +1,15 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+<div class="m-auto text-center">
+    <form>
+        <div class="m-auto text-center">
+            <label">Quiz Name</label>
+            <input type="text" id="quiz-name" name="quiz-name"></input>
+        </div>
+
+        <p>How many questions?</p>
+        <button name="quiz-size" type="submit" value="10">10</button>
+        <button name="quiz-size" type="submit" value="20">20</button>    
+    </form>
+</div>
+{% endblock %}

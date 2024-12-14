@@ -528,8 +528,10 @@ def deleteAccountAsAdmin():
         elif accType and accType == 'admin':
             return redirect(url_for('listAdmin'))
     else:
+        username = request.args.get('username')
+        accType = request.args.get('accType')
 
-        return render_template('delete-account.html')
+        return render_template('delete-account.html', delUsername = username, delAccType = accType)
 
 # list users - returns list-user.html with a list of users to the admin
 # uses decorator fuction requires_admin to ensure an admin is logged in before listing users
@@ -563,25 +565,46 @@ def listUser():
 
 # list admins - returns list-user.html with a list of admins to the admin
 # uses decorator fuction requires_admin to ensure an admin is logged in before listing users
-@app.route('/list-admin')
+@app.route('/list-admin', methods =['GET','POST'])
 @requires_admin
 def listAdmin():
-    db = get_db()
-    db.row_factory = sqlite3.Row
-    cursor = db.cursor()
 
-    try:
-        listQuery = """
-                    SELECT first_name, surname, username, email_address, account_type
-                    FROM admins
-                    """
-        cursor.execute(listQuery)
-        record = cursor.fetchall()
+    if request.method == 'POST':
 
-        return render_template('list-users.html', users = record)
-    except:
-        flash("Couldn't retrieve user data")
-        return redirect(url_for('home'))
+        username = request.form['username']
+        accType = request.form['accType']
+
+        return redirect(url_for('deleteAccountAsAdmin', username = username, accType = accType))
+
+    else:
+        db = get_db()
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+
+        try:
+            listQuery = """
+                        SELECT first_name, surname, username, email_address, account_type
+                        FROM admins
+                        """
+            cursor.execute(listQuery)
+            record = cursor.fetchall()
+
+            return render_template('list-users.html', users = record)
+        except:
+            flash("Couldn't retrieve user data")
+            return redirect(url_for('home'))
+
+@app.route('/create-quiz')
+@requires_admin
+def createQuiz():
+    return render_template("create-quiz-title-size.html")
+
+@app.route('/create-quiz/Q-A')
+@requires_admin
+def createQuizQandA():
+    quizName = "New Quiz"
+    questionAmount = 10
+    return render_template("create-quiz-Q-A.html", quizName = quizName, qAmount = questionAmount)
 
 
 # print config information to the user
