@@ -1,16 +1,18 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
 <script>
+    let quAmount = {{ qAmount }};
     window.onload = function loadFunction() {
-        createQuizInputFields({{ qAmount }});
+        createQuizInputFields(quAmount);
     }
+    
 </script>
 
 <div class="m-auto text-center">
     <h3> {{ quizName }} </h3> 
 </div>
 
-<div id="quizInput" class="d-flex flex-wrap justify-content-around">
+<div id="quizInput" class="w-75 p-3 text-center m-auto">
 
 </div>
 

@@ -40,52 +40,97 @@ function createQuizInputFields(numb) {
     form.setAttribute("name", "quiz");
     form.setAttribute("method", "post");
 
+    let outerDiv = document.createElement("DIV");
+    //outerDiv.setAttribute("class", "d-flex flex-wrap");
+    outerDiv.setAttribute("class", "container");
+
+    let rowDiv = document.createElement("DIV");
+    //outerDiv.setAttribute("class", "d-flex flex-wrap");
+    rowDiv.setAttribute("class", "row");
+
     for(let count = 0; count < numb; count++) {
 
-        let div = documnet.createElement("DIV");
-        div.setAttribute("class", "d-flex flex-column");
+        let innerDivs = document.createElement("DIV");
+        //innerDivs.setAttribute("class", "d-flex flex-column");
+        innerDivs.setAttribute("class", "col-4");
 
         // creates a label for each question
-        let label = document.createElement("LABEL");
-        label.setAttribute("name", "question-input");
+        let questionLabel = document.createElement("LABEL");
+        questionLabel.setAttribute("name", "question-input");
+
         // creates a text node and appends it to the label
-        let text = documnet.createTextNode("Question " + count);
-        label.appendChile(text);
+        let text1 = document.createTextNode("Question " + (count+1));
+        questionLabel.appendChild(text1);
 
         // creates an input for each question
         let questionInput = document.createElement("INPUT");
-        questionInput.setAttribute("type", "text")
+        questionInput.setAttribute("type", "text");
+        questionInput.setAttribute("class", "form-control mb-3");
+
+        // creates a label for wrong answers
+        let wrongAnswersLabel = document.createElement("LABEL");
+        wrongAnswersLabel.setAttribute("name", "question-input");
+
+        // creates a text node and appends it to the label
+        let text2 = document.createTextNode("Wrong Answers");
+        wrongAnswersLabel.appendChild(text2);
 
         // creates 4 answer input for each question
         // answer 1
         let answerOneInput = document.createElement("INPUT");
-        questionInput.setAttribute("type", "text")
+        answerOneInput.setAttribute("type", "text");
+        answerOneInput.setAttribute("class", "form-control mb-3");
 
         // answer 2
         let answerTwoInput = document.createElement("INPUT");
-        questionInput.setAttribute("type", "text")
+        answerTwoInput.setAttribute("type", "text");
+        answerTwoInput.setAttribute("class", "form-control mb-3");
 
         // answer 3
         let answerThreeInput = document.createElement("INPUT");
-        questionInput.setAttribute("type", "text")
+        answerThreeInput.setAttribute("type", "text");
+        answerThreeInput.setAttribute("class", "form-control mb-3");
+
+        // creates a label for wrong answers
+        let correctAnswerLabel = document.createElement("LABEL");
+        correctAnswerLabel.setAttribute("name", "question-input");
+
+        // creates a text node and appends it to the label
+        let text3 = document.createTextNode("Correct Answer");
+        correctAnswerLabel.appendChild(text3);
 
         // answer 4
         let answerFourInput = document.createElement("INPUT");
-        questionInput.setAttribute("type", "text")
+        answerFourInput.setAttribute("type", "text");
+        answerFourInput.setAttribute("class", "form-control mb-3");
 
         // appends the input fields and labels
-        div.append(label);
-        div.append(questioninput);
-        div.append(answerOneInput);
-        div.append(answerTwoInput);
-        div.append(answerThreeInput);
-        div.append(answerFourInput);
+        innerDivs.append(questionLabel);
+        innerDivs.append(questionInput);
 
-        form.appendChild(div);
+        innerDivs.append(wrongAnswersLabel);
+        innerDivs.append(answerOneInput);
+
+        innerDivs.append(answerTwoInput);
+
+        innerDivs.append(answerThreeInput);
+
+        innerDivs.append(correctAnswerLabel);
+        innerDivs.append(answerFourInput);
+
+        // appends innerDiv to outerDiv
+        rowDiv.append(innerDivs);
+
+        // appends innerDiv to outerDiv
+        outerDiv.append(rowDiv);
+
+        // appends outerDiv to form
+        form.appendChild(outerDiv);
 
         //questionInput.setAttribute("", "")
 
     }
+
     // creates button, adds attributes
     let submitBtn = document.createElement("BUTTON")
     submitBtn.setAttribute("type", "submit");

@@ -602,7 +602,7 @@ def createQuiz():
 @app.route('/create-quiz/Q-A')
 @requires_admin
 def createQuizQandA():
-    quizName = "New Quiz"
+    quizName = "Why Won't this work....."
     questionAmount = 10
     return render_template("create-quiz-Q-A.html", quizName = quizName, qAmount = questionAmount)
 
