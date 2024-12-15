@@ -65,6 +65,7 @@ function createQuizInputFields(numb) {
     // creates an input for the quiz name
     let quizNameInput = document.createElement("INPUT");
     quizNameInput.setAttribute("type", "text");
+    quizNameInput.setAttribute("name", "quiz-name");
     quizNameInput.setAttribute("class", "form-control w-25 mx-auto mb-3");
     quizNameInput.setAttribute("style", "min-width: 300px");
 
@@ -89,6 +90,7 @@ function createQuizInputFields(numb) {
         // creates an input for each question
         let questionInput = document.createElement("INPUT");
         questionInput.setAttribute("type", "text");
+        questionInput.setAttribute("name", "question"+(count+1));
         questionInput.setAttribute("class", "form-control mb-3");
 
         // creates a label for wrong answers
@@ -103,16 +105,19 @@ function createQuizInputFields(numb) {
         // answer 1
         let answerOneInput = document.createElement("INPUT");
         answerOneInput.setAttribute("type", "text");
+        answerOneInput.setAttribute("name", "answerOneQ"+(count+1));
         answerOneInput.setAttribute("class", "form-control mb-3");
 
         // answer 2
         let answerTwoInput = document.createElement("INPUT");
         answerTwoInput.setAttribute("type", "text");
+        answerTwoInput.setAttribute("name", "answerTwoQ"+(count+1));
         answerTwoInput.setAttribute("class", "form-control mb-3");
 
         // answer 3
         let answerThreeInput = document.createElement("INPUT");
         answerThreeInput.setAttribute("type", "text");
+        answerThreeInput.setAttribute("name", "answerThreeQ"+(count+1));
         answerThreeInput.setAttribute("class", "form-control mb-3");
 
         // creates a label for wrong answers
@@ -126,6 +131,7 @@ function createQuizInputFields(numb) {
         // answer 4
         let answerFourInput = document.createElement("INPUT");
         answerFourInput.setAttribute("type", "text");
+        answerFourInput.setAttribute("name", "answerFourQ"+(count+1));
         answerFourInput.setAttribute("class", "form-control mb-3");
 
         // appends the input fields and labels
@@ -145,13 +151,14 @@ function createQuizInputFields(numb) {
         // appends innerDiv to outerDiv
         rowDiv.append(innerDivs);
 
-        // appends innerDiv to outerDiv
-        outerDiv.append(rowDiv);
 
-        // appends outerDiv to form
-        form.appendChild(outerDiv);
 
     }
+    // appends rowDiv to outerDiv
+    outerDiv.append(rowDiv);
+
+    // appends outerDiv to form
+    form.appendChild(outerDiv);
 
     // creates button, adds attributes
     let submitBtn = document.createElement("BUTTON")

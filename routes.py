@@ -601,10 +601,20 @@ def listAdmin():
 def createQuiz():
     if request.method == "POST":
         try:
-            raise valeError("error")
+            #quizName = request.form['quiz-name']
 
-        except:
-            flash("didn't work")
+            #numQuestions = request.form('numQuestions')
+
+            for count in range(10):
+               question = request.form['question'+str(count+1)]
+               question2 = request.form['question'+str(count+1)]
+               anwserOne = request.form['answerOneQ'+str(count+1)]
+               anwserTwo = request.form['answerOneQ2']
+
+               return "Question 1: " + question + " " + anwserOne + " | Question 2: " + question2 + " "
+
+        except Exception as e:
+            flash(str(e))
             return redirect(url_for("createQuiz"))
     else:
         return render_template("create-quiz-Q-A.html")
