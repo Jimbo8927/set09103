@@ -36,23 +36,47 @@ function checkPass(event) {
 
 function createQuizInputFields(numb) {
 
+    // fethces the id of the section to add the question and answer input fields
+    let quizSection = document.getElementById("quizInput");
+
+    // checks if the section has child nodes and removes them
+    while(quizSection.hasChildNodes()) {
+        quizSection.removeChild(quizSection.lastChild);
+    }
+
     let form = document.createElement("FORM");
     form.setAttribute("name", "quiz");
     form.setAttribute("method", "post");
 
     let outerDiv = document.createElement("DIV");
-    //outerDiv.setAttribute("class", "d-flex flex-wrap");
     outerDiv.setAttribute("class", "container");
 
     let rowDiv = document.createElement("DIV");
-    //outerDiv.setAttribute("class", "d-flex flex-wrap");
     rowDiv.setAttribute("class", "row");
+
+    // creates a label for each question
+    let quizNameLabel = document.createElement("LABEL");
+    quizNameLabel.setAttribute("name", "quizName-input");
+
+    // creates a text node and appends it to the label
+    let text0 = document.createTextNode("Quiz Name");
+    quizNameLabel.appendChild(text0);
+
+    // creates an input for the quiz name
+    let quizNameInput = document.createElement("INPUT");
+    quizNameInput.setAttribute("type", "text");
+    quizNameInput.setAttribute("class", "form-control w-25 mx-auto mb-3");
+    quizNameInput.setAttribute("style", "min-width: 300px");
+
+    form.appendChild(quizNameLabel);
+    form.appendChild(quizNameInput);
 
     for(let count = 0; count < numb; count++) {
 
         let innerDivs = document.createElement("DIV");
-        //innerDivs.setAttribute("class", "d-flex flex-column");
-        innerDivs.setAttribute("class", "col-4");
+        innerDivs.setAttribute("class", "col-4 mx-auto mb-3 border");
+        innerDivs.setAttribute("style", "min-width: 300px");
+        innerDivs.style.maxWidth = "500px";
 
         // creates a label for each question
         let questionLabel = document.createElement("LABEL");
@@ -127,21 +151,18 @@ function createQuizInputFields(numb) {
         // appends outerDiv to form
         form.appendChild(outerDiv);
 
-        //questionInput.setAttribute("", "")
-
     }
 
     // creates button, adds attributes
     let submitBtn = document.createElement("BUTTON")
     submitBtn.setAttribute("type", "submit");
     submitBtn.setAttribute("class", "btn btn-secondary");
+    submitBtn.textContent = "Create Quiz";
 
     // appends the button to the bottom of the form
     form.append(submitBtn);
 
-    // fethces the id of the section to add the question and answer input fields
     // appends the form created above to the section
-    let quizSection = document.getElementById("quizInput");
     quizSection.append(form);
 }
 

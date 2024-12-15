@@ -594,17 +594,28 @@ def listAdmin():
             flash("Couldn't retrieve user data")
             return redirect(url_for('home'))
 
-@app.route('/create-quiz')
+
+# create quiz - choose name and size of quiz
+@app.route('/create-quiz', methods =['GET','POST'])
 @requires_admin
 def createQuiz():
-    return render_template("create-quiz-title-size.html")
+    if request.method == "POST":
+        try:
+            raise valeError("error")
 
+        except:
+            flash("didn't work")
+            return redirect(url_for("createQuiz"))
+    else:
+        return render_template("create-quiz-Q-A.html")
+
+# create quiz - add questions and answers for quiz
 @app.route('/create-quiz/Q-A')
 @requires_admin
 def createQuizQandA():
-    quizName = "Why Won't this work....."
-    questionAmount = 10
-    return render_template("create-quiz-Q-A.html", quizName = quizName, qAmount = questionAmount)
+    quizName = "Harry Potter"
+    questionAmount = 20
+    return render_template("create-quiz-Q-A.html")
 
 
 # print config information to the user

@@ -1,18 +1,24 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
 <script>
-    let quAmount = {{ qAmount }};
+
     window.onload = function loadFunction() {
-        createQuizInputFields(quAmount);
+        createQuizInputFields(10);
     }
     
 </script>
 
 <div class="m-auto text-center">
-    <h3> {{ quizName }} </h3> 
+    <h3> Create Quiz </h3>
+    <strong><p>How many questions?</p></strong>
+    <button name="quiz-size" class="btn btn-secondary" type="button" onclick="createQuizInputFields(10)" value="10">10</button>
+    <button name="quiz-size" class="btn btn-secondary" type="button" onclick="createQuizInputFields(20)" value="20">20</button>
+ 
 </div>
 
-<div id="quizInput" class="w-75 p-3 text-center m-auto">
+
+
+<div id="quizInput" class="p-3 text-center m-auto">
 
 </div>
 
