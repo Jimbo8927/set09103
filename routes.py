@@ -1,5 +1,5 @@
 # imports flask and libraries
-from flask import Flask, render_template, g, session, request, url_for, redirect, flash
+from flask import Flask, render_template, g, session, request, url_for, redirect, flash, jsonify
 # imports wraps from functools
 from functools import wraps
 # imports sqlite3, configparser, secrets and bcrypt
@@ -439,7 +439,7 @@ def addAdmin():
                     return render_template('add-admin.html', error=errorMessage)
 
             insertQuery = """
-                          INSERT INTO admins (first_name, surname, email_address, username, password, account_type) 
+                          INSERT INTO admins (first_name, surname, email_address, username, password, account_type)
                           VALUES (?, ?, ?, ?, ?, ?)
                           """
 
@@ -601,27 +601,58 @@ def listAdmin():
 def createQuiz():
     if request.method == "POST":
         try:
-            #quizName = request.form['quiz-name']
+            db = get_db()
+            db.row_factory = sqlite3.Row
+            cursor = db.cursor()
+            #numQuestions = request.form['numQuestions']
 
-            #numQuestions = request.form('numQuestions')
-
-            string = ""
+            #string = ""
             quizName = request.form['quiz-name']
-            anwserTwo = request.form['answerOneQ1']
-            anwserThree = request.form['answerTwoQ1']
-            anwserFour = request.form['answerThreeQ1']
-            anwserFive = request.form['answerFourQ1']
+            creatorID = session['id']
+            #string += quizName
 
-            question9 = request.form['question9']
+            quizNameInsertQuery = """
+                                  INSERT INTO quizzes (admin_id, title)
+                                  VALUES (?, ?)
+                                  """
+            cursor.execute(quizNameInsertQuery, (creatorID, quizName))
 
-            for count in range(3):
+            quizIdQuery = """
+                      SELECT last_insert_rowid()
+                      """
+
+            cursor.execute(quizIdQuery)
+            getQuizID = cursor.fetchone()
+
+            quizId = getQuizID['last_insert_rowid()']
+
+            for count in range(10):
                 question = request.form['question'+str(count+1)]
-                #anwserOne = request.form['answerTwoQ'+str(count+1)]
-                #string += question + " " + answerOne + " | "
+                answerOne = request.form['answerOneQ'+str(count+1)]
+                answerTwo = request.form['answerTwoQ'+str(count+1)]
+                answerThree = request.form['answerThreeQ'+str(count+1)]
+                answerFour = request.form['answerFourQ'+str(count+1)]
+                #string += "Question "+ str(count+1) + ": " + question + " Answers A1: " + answerOne + ", A2: " + answerTwo + ", A3: " + answerThree + ", A4: " + answerFour + " | "
 
-            return "Question: " + quizName + " "
-            #return "Question: " + string + " "
-# + anwserOne + " | Question 2: " + question2 + " " + question3
+                questionInseryQuery = """
+                                      INSERT INTO questions (quiz_id, question)
+                                      VALUES(?, ?)
+                                      """
+                cursor.execute(questionInseryQuery, (quizId, question))
+
+                questionIdQuery = """
+                      SELECT last_insert_rowid()
+                      """
+
+                cursor.execute(questionIdQuery)
+                getQuestionID = cursor.fetchone()
+
+                questionId = getQuestionID['last_insert_rowid()']
+
+            return "working so far....."
+                #return str("Quiz ID: "+str(quizId)+" QuestionID: "+str(questionId))
+            #flash("Quiz Added Successfully")
+            #return redirect(url_for("quizList"))
 
         except Exception as e:
             flash(str(e))
@@ -629,12 +660,10 @@ def createQuiz():
     else:
         return render_template("create-quiz-Q-A.html")
 
-# to be decided
-@app.route('/create-quiz/Q-A')
-@requires_admin
-def createQuizQandA():
-    quizName = "Harry Potter"
-    questionAmount = 20
+# quiz list
+@app.route('/quiz-list')
+@requires_login
+def quizList():
     return render_template("create-quiz-Q-A.html")
 
 

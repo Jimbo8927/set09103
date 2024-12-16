@@ -68,6 +68,7 @@ function createQuizInputFields(numb) {
     quizNameInput.setAttribute("name", "quiz-name");
     quizNameInput.setAttribute("class", "form-control w-25 mx-auto mb-3");
     quizNameInput.setAttribute("style", "min-width: 300px");
+    quizNameInput.required = true;
 
     form.appendChild(quizNameLabel);
     form.appendChild(quizNameInput);
@@ -92,6 +93,7 @@ function createQuizInputFields(numb) {
         questionInput.setAttribute("type", "text");
         questionInput.setAttribute("name", "question"+(count+1));
         questionInput.setAttribute("class", "form-control mb-3");
+        //questionInput.required = true;
 
         // creates a label for wrong answers
         let wrongAnswersLabel = document.createElement("LABEL");
@@ -107,18 +109,21 @@ function createQuizInputFields(numb) {
         answerOneInput.setAttribute("type", "text");
         answerOneInput.setAttribute("name", "answerOneQ"+(count+1));
         answerOneInput.setAttribute("class", "form-control mb-3");
+        //answerOneInput.required = true;
 
         // answer 2
         let answerTwoInput = document.createElement("INPUT");
         answerTwoInput.setAttribute("type", "text");
         answerTwoInput.setAttribute("name", "answerTwoQ"+(count+1));
         answerTwoInput.setAttribute("class", "form-control mb-3");
+        //answerTwoInput.required = true;
 
         // answer 3
         let answerThreeInput = document.createElement("INPUT");
         answerThreeInput.setAttribute("type", "text");
         answerThreeInput.setAttribute("name", "answerThreeQ"+(count+1));
         answerThreeInput.setAttribute("class", "form-control mb-3");
+        //answerThreeInput.required = true;
 
         // creates a label for wrong answers
         let correctAnswerLabel = document.createElement("LABEL");
@@ -133,6 +138,7 @@ function createQuizInputFields(numb) {
         answerFourInput.setAttribute("type", "text");
         answerFourInput.setAttribute("name", "answerFourQ"+(count+1));
         answerFourInput.setAttribute("class", "form-control mb-3");
+        //answerFourInput.required = true;
 
         // appends the input fields and labels
         innerDivs.append(questionLabel);
