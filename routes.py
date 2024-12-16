@@ -606,10 +606,10 @@ def createQuiz():
             cursor = db.cursor()
             #numQuestions = request.form['numQuestions']
 
-            #string = ""
+            string = ""
             quizName = request.form['quiz-name']
             creatorID = session['id']
-            #string += quizName
+            string += quizName
 
             quizNameInsertQuery = """
                                   INSERT INTO quizzes (admin_id, title)
@@ -632,7 +632,6 @@ def createQuiz():
                 answerTwo = request.form['answerTwoQ'+str(count+1)]
                 answerThree = request.form['answerThreeQ'+str(count+1)]
                 answerFour = request.form['answerFourQ'+str(count+1)]
-                #string += "Question "+ str(count+1) + ": " + question + " Answers A1: " + answerOne + ", A2: " + answerTwo + ", A3: " + answerThree + ", A4: " + answerFour + " | "
 
                 questionInseryQuery = """
                                       INSERT INTO questions (quiz_id, question)
@@ -649,10 +648,41 @@ def createQuiz():
 
                 questionId = getQuestionID['last_insert_rowid()']
 
-            return "working so far....."
+                answerQuery = """
+                              INSERT INTO answers (question_id, answer, is_correct)
+                              VALUES (?, ?, ?)
+                              """
+                cursor.execute(answerQuery, (questionId, answerOne, False))
+
+                cursor.execute(answerQuery, (questionId, answerTwo, False))
+
+                cursor.execute(answerQuery, (questionId, answerThree, False))
+
+                cursor.execute(answerQuery, (questionId, answerFour, True))
+
+             #   quizQuery = """
+
+             #   data = ""
+             #   cursor.execute(quizQuery)
+             #   getData = cursor.fetchall()
+             #   for row in getData:
+                    #print(row)
+             #       data += " Answer ID: "
+             #       data += str(row['answer_id'])
+             #       data += " Question ID: "
+             #       data += str(row['question_id'])
+             #       data += " Answer: "
+             #       data += str(row['answer'])
+             #       data += " Correct: "
+             #       data += row['is_correct']
+            #return string
+            #return data
+            #return "working so far....."
                 #return str("Quiz ID: "+str(quizId)+" QuestionID: "+str(questionId))
-            #flash("Quiz Added Successfully")
-            #return redirect(url_for("quizList"))
+
+            db.commit()
+            flash("Quiz Added Successfully")
+            return redirect(url_for("quizList"))
 
         except Exception as e:
             flash(str(e))
@@ -664,7 +694,7 @@ def createQuiz():
 @app.route('/quiz-list')
 @requires_login
 def quizList():
-    return render_template("create-quiz-Q-A.html")
+    return render_template("home.html")
 
 
 # print config information to the user
