@@ -605,13 +605,23 @@ def createQuiz():
 
             #numQuestions = request.form('numQuestions')
 
-            for count in range(10):
-               question = request.form['question'+str(count+1)]
-               question2 = request.form['question'+str(count+1)]
-               anwserOne = request.form['answerOneQ'+str(count+1)]
-               anwserTwo = request.form['answerOneQ2']
+            string = ""
+            quizName = request.form['quiz-name']
+            anwserTwo = request.form['answerOneQ1']
+            anwserThree = request.form['answerTwoQ1']
+            anwserFour = request.form['answerThreeQ1']
+            anwserFive = request.form['answerFourQ1']
 
-               return "Question 1: " + question + " " + anwserOne + " | Question 2: " + question2 + " "
+            question9 = request.form['question9']
+
+            for count in range(3):
+                question = request.form['question'+str(count+1)]
+                #anwserOne = request.form['answerTwoQ'+str(count+1)]
+                #string += question + " " + answerOne + " | "
+
+            return "Question: " + quizName + " "
+            #return "Question: " + string + " "
+# + anwserOne + " | Question 2: " + question2 + " " + question3
 
         except Exception as e:
             flash(str(e))
@@ -619,7 +629,7 @@ def createQuiz():
     else:
         return render_template("create-quiz-Q-A.html")
 
-# create quiz - add questions and answers for quiz
+# to be decided
 @app.route('/create-quiz/Q-A')
 @requires_admin
 def createQuizQandA():
