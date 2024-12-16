@@ -1,0 +1,30 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+
+<h3 class="text-center">Choose a quiz below</h3>
+
+{% for quiz in quizes %}
+    <div class="d-flex flex-row justify-content-around">
+
+        <p><strong>{{ quiz['title'] }}</strong></p>
+
+        <form name="list-user" method="post" action="">
+
+            <a href="/"><button type="submit" class="btn btn-secondary">Start</button></a>
+
+            <a href="/"><button type="submit" class="btn btn-secondary">Leaderboard</button></a>
+
+            {% if 'account_type' in session and session['account_type'] == 'admin'  %}
+                <a href="/"><button type="submit" class="btn btn-secondary">Edit</button></a>
+            {% endif %}
+
+            <input type="hidden" name="quizId" value="{{ quiz['quiz_id'] }}">
+        </form>
+
+    </div>
+    <div class="w-75 mx-auto">
+        <hr>
+    </div>
+{% endfor %}
+
+{% endblock %}

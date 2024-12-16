@@ -606,10 +606,8 @@ def createQuiz():
             cursor = db.cursor()
             #numQuestions = request.form['numQuestions']
 
-            string = ""
             quizName = request.form['quiz-name']
             creatorID = session['id']
-            string += quizName
 
             quizNameInsertQuery = """
                                   INSERT INTO quizzes (admin_id, title)
@@ -660,7 +658,7 @@ def createQuiz():
 
                 cursor.execute(answerQuery, (questionId, answerFour, True))
 
-             #   quizQuery = """
+             #   quizQuery =
 
              #   data = ""
              #   cursor.execute(quizQuery)
@@ -685,7 +683,7 @@ def createQuiz():
             return redirect(url_for("quizList"))
 
         except Exception as e:
-            flash(str(e))
+            flash("Couldn't create a quiz at this time, try again later")
             return redirect(url_for("createQuiz"))
     else:
         return render_template("create-quiz-Q-A.html")
@@ -694,7 +692,24 @@ def createQuiz():
 @app.route('/quiz-list')
 @requires_login
 def quizList():
-    return render_template("home.html")
+
+    try:
+        db = get_db()
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+
+        quizQuery = """
+                    SELECT quiz_id, title
+                    FROM quizzes
+                    """
+
+        cursor.execute(quizQuery)
+        quiz = cursor.fetchall()
+
+
+        return render_template("quiz-list.html", quizes = quiz)
+    except:
+        return "placeholder"
 
 
 # print config information to the user

@@ -10,8 +10,10 @@
 				<li class="nav-item dropdown">
 				    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Quizzes</a>
                                     <ul class="dropdown-menu"> 
-                                        <li><a class="dropdown-item" href="#">Quiz List</a></li>
-                                        <li><a class="dropdown-item" href="/create-quiz">Create Quiz</a></li>
+                                        <li><a class="dropdown-item" href="/quiz-list">Quiz List</a></li>
+                                        {% if 'account_type' in session and session['account_type'] == 'admin' %}
+                                            <li><a class="dropdown-item" href="/create-quiz">Create Quiz</a></li>
+                                        {% endif %}
                                     </ul>
 				</li>
                                 {% if 'account_type' in session and session['account_type'] == 'admin' %}
