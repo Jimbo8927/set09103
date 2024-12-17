@@ -492,7 +492,7 @@ def deleteAccount():
             return redirect(url_for('home'))
     else:
         return render_template('delete-account.html')
-#rename ------------------------------------------------------------------
+
 #delete account as admin
 @app.route('/delete-account-asAdmin', methods =['GET','POST'])
 @requires_admin
@@ -604,7 +604,8 @@ def createQuiz():
             db = get_db()
             db.row_factory = sqlite3.Row
             cursor = db.cursor()
-            #numQuestions = request.form['numQuestions']
+
+            numQuestions = request.form['numQuestions']
 
             quizName = request.form['quiz-name']
             creatorID = session['id']
@@ -658,25 +659,6 @@ def createQuiz():
 
                 cursor.execute(answerQuery, (questionId, answerFour, True))
 
-             #   quizQuery =
-
-             #   data = ""
-             #   cursor.execute(quizQuery)
-             #   getData = cursor.fetchall()
-             #   for row in getData:
-                    #print(row)
-             #       data += " Answer ID: "
-             #       data += str(row['answer_id'])
-             #       data += " Question ID: "
-             #       data += str(row['question_id'])
-             #       data += " Answer: "
-             #       data += str(row['answer'])
-             #       data += " Correct: "
-             #       data += row['is_correct']
-            #return string
-            #return data
-            #return "working so far....."
-                #return str("Quiz ID: "+str(quizId)+" QuestionID: "+str(questionId))
 
             db.commit()
             flash("Quiz Added Successfully")
@@ -688,29 +670,84 @@ def createQuiz():
     else:
         return render_template("create-quiz-Q-A.html")
 
-# quiz list
-@app.route('/quiz-list')
+# quiz list - lists all current quizes
+# queries the quizzes database table returning the title and id of each
+# redirects the user to the home page, returning an error message if the list cannot be returned
+@app.route('/quiz-list', methods =['GET','POST'])
 @requires_login
 def quizList():
 
-    try:
-        db = get_db()
-        db.row_factory = sqlite3.Row
-        cursor = db.cursor()
+    if request.method == "POST":
 
-        quizQuery = """
-                    SELECT quiz_id, title
-                    FROM quizzes
-                    """
+        quizId = request.form["quizId"]
 
-        cursor.execute(quizQuery)
-        quiz = cursor.fetchall()
+        if 'start' in request.form:
+            return redirect(url_for("takeQuiz", quizId = quizId))
+        elif 'leaderboard' in request.form:
+            return redirect(url_for("leaderboard", quizId = quizId))
+        elif 'delete' in request.form:
+            return redirect(url_for("deleteQuiz", quizId = quizId))
+
+    else:
+        try:
+            db = get_db()
+            db.row_factory = sqlite3.Row
+            cursor = db.cursor()
+
+            quizQuery = """
+                        SELECT quiz_id, title
+                        FROM quizzes
+                        """
+
+            cursor.execute(quizQuery)
+            quiz = cursor.fetchall()
 
 
-        return render_template("quiz-list.html", quizes = quiz)
-    except:
-        return "placeholder"
+            return render_template("quiz-list.html", quizes = quiz)
+        except:
+            flash("Couldn't display the quizes at this time, please try again later")
+            return redirect(url_for("home"))
 
+# startQuiz
+@app.route('/quiz', methods =['GET','POST'])
+@requires_login
+def takeQuiz():
+    quizId = request.args["quizId"]
+
+    db = get_db()
+    db.row_factory = sqlite3.Row
+    cursor = db.cursor()
+
+    quizQuery = """
+                SELECT quiz.title, question.question, answer.answer, answer.is_correct
+                FROM quizzes quiz
+                JOIN questions question
+                ON quizzes.quiz_id = question.quiz_id
+                JOIN answers answer
+                ON question.question_id = answer.question_id
+                """
+
+
+    cursor.execute(quizQuery)
+    quiz = cursor.fetchall()
+
+
+
+    return render_template('questionPage', quiz = quiz)
+
+# leaderboard
+@app.route('/leaderboard', methods =['GET','POST'])
+@requires_login
+def leaderboard():
+    quizId = request.args["quizId"]
+    return quizId
+
+# delete quiz
+@app.route('/delete-quiz', methods =['GET','POST'])
+@requires_admin
+def deleteQuiz():
+    quizId = request.args["quizId"]
+    return quizId
 
 # print config information to the user
 # uses decorator fuction requires_admin to ensure an admin is logged in before displaying information

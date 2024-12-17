@@ -1,0 +1,25 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+{% for question in quiz %}
+    <div class="d-flex flex-row justify-content-around">
+
+        <div class="d-flex flex-column">
+            <p><strong>First Name</strong></p>
+            <p>{{ question['title'] }}</p>
+
+            <p><strong>Surname</strong></p>
+            <p>{{ question['question'] }}</p>
+        </div>
+
+        <div class="d-flex flex-column">
+            <p><strong>Username</strong></p>
+            <p>{{ question['answer'] }}</p>
+
+            <p><strong>Email</strong></p>
+            <p>{{ question['is_correct'] }}</p>
+
+        </div>
+
+    </div>
+{% endfor %}
+

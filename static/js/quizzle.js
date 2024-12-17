@@ -167,6 +167,14 @@ function createQuizInputFields(numb) {
     form.appendChild(outerDiv);
 
     // creates button, adds attributes
+    let numQuestions = document.createElement("INPUT")
+    numQuestions.setAttribute("type", "hidden");
+    numQuestions.setAttribute("name", "numQuestions");
+    numQuestions.value = numb;
+
+    form.append(numQuestions);
+
+    // creates button, adds attributes
     let submitBtn = document.createElement("BUTTON")
     submitBtn.setAttribute("type", "submit");
     submitBtn.setAttribute("class", "btn btn-secondary");
