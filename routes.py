@@ -1,5 +1,5 @@
 # imports flask and libraries
-from flask import Flask, render_template, g, session, request, url_for, redirect, flash, jsonify
+from flask import Flask, render_template, g, session, request, url_for, redirect, flash
 # imports wraps from functools
 from functools import wraps
 # imports sqlite3, configparser, secrets and bcrypt
@@ -736,20 +736,32 @@ def takeQuiz():
     qNum = None
     qDict = {}
     count = 1
+    qCount = 0
 
-    qDict.update({"title": quiz["title"]})
-    qDict.update({"questions": {}})
 
     for row in quiz:
-        for q in qDict["questions"]:
-            if qDict["questions"][count]["qId"] == row["question_id"]:
-                qDict["questions"]["answers"].update({row["answer"], row["is_coorect"]})
+        if "title" not in qDict:
+             qDict.update({"title": row["title"]})
+             qDict.update({"questions": {}})
+
+        questionId = row["question_id"]
+
+        for question in qDict["questions"]:
+            qCount += 1
+            if qDict["questions"][qCount]["qId"] == questionId:
+                qDict["questions"][qCount]["answers"].update({row["answer"]: row["is_correct"]})
             else:
-                qDict["questions"].update({count: {"qId": row["question_id"], "question": row["question"], "answers": {row["answer": row["is_correct"]]}}})
+                qDict["questions"].update({count: {
+                                                  "qId": row["question_id"],
+                                                  "question": row["question"],
+                                                  "answers": {row["answer": row["is_correct"]]}
+                                                  }})
                 count += 1
 
+    question = qDict
 
-    return render_template('questionPage.html', quiz = quiz)
+    return qDict
+    #return render_template('questionPage.html', question = question)
 
 # leaderboard
 @app.route('/leaderboard', methods =['GET','POST'])
