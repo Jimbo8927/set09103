@@ -719,21 +719,37 @@ def takeQuiz():
     cursor = db.cursor()
 
     quizQuery = """
-                SELECT quiz.title, question.question, answer.answer, answer.is_correct
-                FROM quizzes quiz
-                JOIN questions question
-                ON quizzes.quiz_id = question.quiz_id
-                JOIN answers answer
-                ON question.question_id = answer.question_id
+                SELECT quizzes.title, questions.question_id, questions.question, answers.answer, answers.is_correct
+                FROM quizzes
+                JOIN questions
+                ON quizzes.quiz_id = questions.quiz_id
+                JOIN answers
+                ON questions.question_id = answers.question_id
+                WHERE quizzes.quiz_id = ?
+                ORDER BY RANDOM()
                 """
 
 
-    cursor.execute(quizQuery)
+    cursor.execute(quizQuery, (quizId,))
     quiz = cursor.fetchall()
 
+    qNum = None
+    qDict = {}
+    count = 1
+
+    qDict.update({"title": quiz["title"]})
+    qDict.update({"questions": {}})
+
+    for row in quiz:
+        for q in qDict["questions"]:
+            if qDict["questions"][count]["qId"] == row["question_id"]:
+                qDict["questions"]["answers"].update({row["answer"], row["is_coorect"]})
+            else:
+                qDict["questions"].update({count: {"qId": row["question_id"], "question": row["question"], "answers": {row["answer": row["is_correct"]]}}})
+                count += 1
 
 
-    return render_template('questionPage', quiz = quiz)
+    return render_template('questionPage.html', quiz = quiz)
 
 # leaderboard
 @app.route('/leaderboard', methods =['GET','POST'])
