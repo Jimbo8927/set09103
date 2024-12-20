@@ -736,32 +736,49 @@ def takeQuiz():
     qNum = None
     qDict = {}
     count = 1
-    qCount = 0
-
+    session["qNum"] = 1
 
     for row in quiz:
+
         if "title" not in qDict:
              qDict.update({"title": row["title"]})
              qDict.update({"questions": {}})
 
         questionId = row["question_id"]
+        questionInDict = False
 
-        for question in qDict["questions"]:
-            qCount += 1
-            if qDict["questions"][qCount]["qId"] == questionId:
-                qDict["questions"][qCount]["answers"].update({row["answer"]: row["is_correct"]})
-            else:
-                qDict["questions"].update({count: {
-                                                  "qId": row["question_id"],
-                                                  "question": row["question"],
-                                                  "answers": {row["answer": row["is_correct"]]}
-                                                  }})
-                count += 1
+        for question in qDict["questions"].values():
 
-    question = qDict
+            if question["qId"] == questionId:
+                question["answers"].update({row["answer"]: row["is_correct"]})
+                questionInDict = True
 
-    return qDict
-    #return render_template('questionPage.html', question = question)
+        if not questionInDict:
+            qDict["questions"].update({
+                count: {
+                       "qId": row["question_id"],
+                       "question": row["question"],
+                       "answers": {row["answer"]: row["is_correct"]}
+                       }})
+            count += 1
+
+    title = qDict["title"]
+
+    quizScore = 0
+
+    if qNum in session and request.method = "POST":
+        if True in request.form:
+            quizScore += 1
+
+        session["qnum"] += 1
+        question = qDict["questions"][session["qNum"]]
+        return render_template('questionPage.html', title=title, question = question)
+    elif qNum in session:
+        question = qDict["questions"][session["qNum"]]
+        return render_template('questionPage.html', title=title, question = question)
+    else:
+        flash("Sorry, couldn't continue with the quiz. Please try again later.")
+        return redirect(url_for("home"))
 
 # leaderboard
 @app.route('/leaderboard', methods =['GET','POST'])
