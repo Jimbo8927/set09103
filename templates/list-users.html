@@ -1,5 +1,9 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+
+<!-- sets title to title variable -->
+<h1 class="text-center">{{ title }}</h1>
+
 <!-- Lists users/admin depending on request  -->
 {% for user in users %}
     <div class="d-flex flex-row justify-content-around">
@@ -23,10 +27,11 @@
 
     </div>
 <form name="list-user" method="post" action="">
-
+    <!-- returns the selected users username and account type -->
     <input type="hidden" name="username" value="{{ user['username'] }}">
     <input type="hidden" name="accType" value="{{ user['account_type'] }}">
 
+    <!-- directs user to confirmation page -->
     <div class="d-flex flex-row justify-content-around">
         <a href="/delete-account-asAdmin"><button type="submit" class="btn btn-secondary">Delete Account</button></a>
     </div>

@@ -1,5 +1,6 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+<!-- page title -->
 <h1 class="text-center">Enter Details Below</h1>
 
 <h5 class="text-center p-3"> {{ error }} </h5>
@@ -8,40 +9,42 @@
    <strong><label id="errorMessage"></label></strong>
 </div>
 
-<form name="sign-up" id="sign-up" action="" method="post">
+<div class="my-auto">
+    <form name="sign-up" id="sign-up" action="" method="post">
     
 
-    <div class="d-flex flex-row justify-content-around">
+        <div class="d-flex flex-wrap justify-content-around">
 
-        <div class="d-flex flex-column">
-            <label for="fname"><strong>First Name</strong></label><br>
-            <input type="text" id="fname" name="fname" required> </input><br>
+            <div class="d-flex flex-column">
+                <label for="fname"><strong>First Name</strong></label><br>
+                <input type="text" id="fname" name="fname" required> </input><br>
 
-           <label for="surname"><strong>Surname</strong></label><br>
-           <input type="text" id="surname" name="surname" required> </input><br>
-        </div>
+               <label for="surname"><strong>Surname</strong></label><br>
+               <input type="text" id="surname" name="surname" required> </input><br>
+            </div>
 
-        <div class="d-flex flex-column">
-            <label for="username"><strong>Username</strong></label><br>
-            <input type="text" id="username" name="username" required> </input><br>
+            <div class="d-flex flex-column">
+                <label for="username"><strong>Username</strong></label><br>
+                <input type="text" id="username" name="username" required> </input><br>
 
-            <label for="email"><strong>Email Address</strong></label><br>
-            <input type="email" id="email" name="email" required> </input><br>
-        </div>
+                <label for="email"><strong>Email Address</strong></label><br>
+                <input type="email" id="email" name="email" required> </input><br>
+            </div>
        
-        <div class="d-flex flex-column">
-            <label for="password"><strong>Password</strong></label><br>
-            <input type="password" id="password" name="password" required> </input><br>
+            <div class="d-flex flex-column">
+                <label for="password"><strong>Password</strong></label><br>
+                <input type="password" id="password" name="password" required> </input><br>
 
-            <label for="confirm-password"><strong>Confirm Password</strong></label><br>
-            <input type="password" id="confirm-password" name="confirm-password" required> </input><br>
+                <label for="confirm-password"><strong>Confirm Password</strong></label><br>
+                <input type="password" id="confirm-password" name="confirm-password" required> </input><br>
+            </div>
         </div>
-    </div>
-    <div class="text-center">
-        <button type="button" class="btn btn-secondary" name="button" onClick="checkSignUp(event)" value="sign up">Sign Up</button>
-    </div>
+        <div class="text-center">
+            <button type="button" class="btn btn-secondary" name="button" onClick="checkSignUp(event)" value="sign up">Sign Up</button>
+        </div>
 
-</form>
+    </form>
+</div>
 
 
 {% endblock %}

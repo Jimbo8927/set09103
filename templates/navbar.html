@@ -1,11 +1,15 @@
+<!-- boot strap navbar-->
 <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+
 	<div class="container-fluid">
+                
 		<a class="navbar-brand" href="/"><img src="/static/images/site-images/QuizzleLogo.png" alt="Quizzle Logo" class="img-fluid"></a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav ms-auto mb-2 mb-lg-0 fs-3">
+                         <!-- ensures a user is logged in before showing navigation for sections that require an account-->
                          {% if 'logged-in' in session and session['logged-in'] %}
 				<li class="nav-item dropdown">
 				    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Quizzes</a>
@@ -16,12 +20,15 @@
                                         {% endif %}
                                     </ul>
 				</li>
+                                <!-- ensures that it is an admin logged in before showing admin only options-->
                                 {% if 'account_type' in session and session['account_type'] == 'admin' %}
                                    <li class="nav-item dropdown"> 
                                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">List Users</a>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item" href="/list-users">List Users</a></li>
                                             <li><a class="dropdown-item" href="/list-admin">List Admin</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="/add-admin">Add Admin Account</a></li>
                                         </ul>
                                     </li>
                                 {% endif %}
@@ -35,7 +42,7 @@
                                 
 
                           {% else %}
-                              
+                                <!-- default navigation whn not logged in-->
                                 <li class="nav-item">
                                         <a class="nav-link" href="/log-in">Log In</a>
                                 </li>

@@ -88,7 +88,7 @@ def home():
     return render_template('home.html')
 
 # login - makes use of post and get methods
-# login returns the log-in.html file to be diaplsyed to the user
+# login returns the log-in.html file to be displayed to the user
 # When a user attempts to login a post request is made, the username and password input in the log in form is used to check for a match in the database where both username and password match
 # If there is a match session variabes are set accordingly and the user is navigated to the home page.
 @app.route('/log-in', methods = ['GET', 'POST'])
@@ -558,7 +558,9 @@ def listUser():
             cursor.execute(listQuery)
             record = cursor.fetchall()
 
-            return render_template('list-users.html', users = record)
+            title = "User Accounts"
+
+            return render_template('list-users.html', title = title, users = record)
         except:
             flash("Couldn't retrieve user data")
             return redirect(url_for('home'))
@@ -589,7 +591,9 @@ def listAdmin():
             cursor.execute(listQuery)
             record = cursor.fetchall()
 
-            return render_template('list-users.html', users = record)
+            title = "Admin Accounts"
+
+            return render_template('list-users.html', title = title, users = record)
         except:
             flash("Couldn't retrieve user data")
             return redirect(url_for('home'))

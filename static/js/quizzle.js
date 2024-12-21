@@ -1,3 +1,6 @@
+// checks sign up
+// esures all fields are filled and
+// ensures both passwords fields are the same before trying to submit to the server
 function checkSignUp(event) {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
@@ -18,6 +21,7 @@ function checkSignUp(event) {
     }
 }
 
+// ensures both passwords fields are the same before trying to submit to the server
 function checkPass(event) {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
@@ -33,7 +37,7 @@ function checkPass(event) {
         errorMessage.textContent = "Passwords Don't match, ensure both password and confirm password are the same";
     }
 }
-
+// create quiz input fields dynamically using dom, to allow various size quizes
 function createQuizInputFields(numb) {
 
     // fethces the id of the section to add the question and answer input fields
@@ -43,11 +47,12 @@ function createQuizInputFields(numb) {
     while(quizSection.hasChildNodes()) {
         quizSection.removeChild(quizSection.lastChild);
     }
-
+    // creates form element and assigns attributes
     let form = document.createElement("FORM");
     form.setAttribute("name", "quiz");
     form.setAttribute("method", "post");
 
+    // creates div element and assigns attribute
     let outerDiv = document.createElement("DIV");
     outerDiv.setAttribute("class", "container");
 
