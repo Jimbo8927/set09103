@@ -682,7 +682,7 @@ def quizList():
         quizId = request.form["quizId"]
 
         if 'start' in request.form:
-            return redirect(url_for("takeQuiz", quizId = quizId))
+            return redirect(url_for("startQuiz", quizId = quizId))
         elif 'leaderboard' in request.form:
             return redirect(url_for("leaderboard", quizId = quizId))
         elif 'delete' in request.form:
@@ -711,74 +711,107 @@ def quizList():
 # startQuiz
 @app.route('/quiz', methods =['GET','POST'])
 @requires_login
+def startQuiz():
+
+    if request.method == "POST":
+
+        if "quiz" in request.form:
+            quiz = request.form["quiz"]
+            return redirect(url_for('takeQuiz', quiz = quiz))
+        else:
+            flash("Sorry, couldn't continue with the quiz. Please try again later.")
+            return redirect(url_for("home"))
+
+    else:
+        try:
+            quizId = request.args["quizId"]
+
+            db = get_db()
+            db.row_factory = sqlite3.Row
+            cursor = db.cursor()
+
+            quizQuery = """
+                        SELECT quizzes.title, questions.question_id, questions.question, answers.answer, answers.is_correct
+                        FROM quizzes
+                        JOIN questions
+                        ON quizzes.quiz_id = questions.quiz_id
+                        JOIN answers
+                        ON questions.question_id = answers.question_id
+                        WHERE quizzes.quiz_id = ?
+                        ORDER BY RANDOM()
+                        """
+
+
+            cursor.execute(quizQuery, (quizId,))
+            quiz = cursor.fetchall()
+
+            qDict = {}
+            count = 1
+
+            for row in quiz:
+
+                if "title" not in qDict:
+                    qDict.update({"title": row["title"]})
+                    qDict.update({"questions": {}})
+
+                questionId = row["question_id"]
+                questionInDict = False
+
+                for question in qDict["questions"].values():
+
+                    if question["qId"] == questionId:
+                        question["answers"].update({row["answer"]: row["is_correct"]})
+                        questionInDict = True
+
+                if not questionInDict:
+                    qDict["questions"].update({
+                        count: {
+                               "qId": row["question_id"],
+                               "question": row["question"],
+                               "answers": {row["answer"]: row["is_correct"]}
+                               }})
+                    count += 1
+
+            quiz = qDict
+
+            return render_template('quizStart.html', quiz=quiz)
+        except Exception as e:
+            flash(str(e))
+            flash("Sorry, couldn't continue with the quiz. Please try again later.")
+            return redirect(url_for("home"))
+
+# takeQuiz
+@app.route('/quiz/question', methods =['GET','POST'])
+@requires_login
 def takeQuiz():
-    quizId = request.args["quizId"]
 
-    db = get_db()
-    db.row_factory = sqlite3.Row
-    cursor = db.cursor()
-
-    quizQuery = """
-                SELECT quizzes.title, questions.question_id, questions.question, answers.answer, answers.is_correct
-                FROM quizzes
-                JOIN questions
-                ON quizzes.quiz_id = questions.quiz_id
-                JOIN answers
-                ON questions.question_id = answers.question_id
-                WHERE quizzes.quiz_id = ?
-                ORDER BY RANDOM()
-                """
-
-
-    cursor.execute(quizQuery, (quizId,))
-    quiz = cursor.fetchall()
-
-    qNum = None
-    qDict = {}
-    count = 1
-    session["qNum"] = 1
-
-    for row in quiz:
-
-        if "title" not in qDict:
-             qDict.update({"title": row["title"]})
-             qDict.update({"questions": {}})
-
-        questionId = row["question_id"]
-        questionInDict = False
-
-        for question in qDict["questions"].values():
-
-            if question["qId"] == questionId:
-                question["answers"].update({row["answer"]: row["is_correct"]})
-                questionInDict = True
-
-        if not questionInDict:
-            qDict["questions"].update({
-                count: {
-                       "qId": row["question_id"],
-                       "question": row["question"],
-                       "answers": {row["answer"]: row["is_correct"]}
-                       }})
-            count += 1
-
-    title = qDict["title"]
-
-    quizScore = 0
+    if "quiz" in request.args:
+        quiz = request.args["quiz"]
+    else:
+        raise ValueError("quiz not in args")
 
     if "qNum" in session and request.method == "POST":
-        if True in request.form:
-            quizScore += 1
+        try:
 
-        session["qNum"] += 1
-        question = qDict["questions"][session["qNum"]]
-        return render_template('questionPage.html', title=title, question = question)
-    elif "qNum" in session:
-        question = qDict["questions"][session["qNum"]]
-        return render_template('questionPage.html', title=title, question = question)
+            if True in request.form:
+                quizScore += 1
+
+            session["qNum"] += 1
+            question = quiz["questions"][session["qNum"]]
+
+
+            return render_template('questionPage.html', quiz = quiz, question = question)
+
+        except:
+            flash("Sorry, couldn't continue with the quiz. Please try again later.")
+            return redirect(url_for("home"))
+
     else:
-        flash("Sorry, couldn't continue with the quiz. Please try again later.")
-        return redirect(url_for("home"))
+        session["qNum"] = 1
+        session["quizScore"] = 0
+        question = quiz["questions"][session["qNum"]]
+        return render_template('questionPage.html', quiz = quiz, question = question)
+
 
 # leaderboard
 @app.route('/leaderboard', methods =['GET','POST'])

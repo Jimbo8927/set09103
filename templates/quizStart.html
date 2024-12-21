@@ -1,0 +1,16 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+    <div class="m-auto text-center">
+        <h3 class="text-center">{{ quiz['title'] }}</h3>
+
+        <div class="d-flex flex-row justify-content-around">
+            <form name="delete" method="post" action="">
+                <button type="submit" class="btn btn-secondary" value="start">Start</button>
+                <input type="hidden" name="quiz"  value="{{ quiz }}">
+            </form>
+
+            <a href="{{url_for('quizList')}}"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
+        </div>
+    </div>
+
+{% endblock %}
