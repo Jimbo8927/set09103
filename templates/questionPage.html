@@ -1,27 +1,23 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
-{% for question in quiz %}
-    <div class="d-flex flex-row justify-content-around">
-        <p>{{ question['title'] }}</p>
 
-        <p>{{ question['question'] }}</p>
-        <div class="d-flex flex-column">
-            <p><strong></strong></p>
-            <p>{{ question['answer'] }}</p>
+<div class="d-flex flex-column justify-content-around text-center">
 
-            <p><strong>Surname</strong></p>
-            <p>{{ question['answer'] }}</p>
-        </div>
+    <h3><strong>{{ title }}</strong></h3>
 
-        <div class="d-flex flex-column">
-            <p><strong>Username</strong></p>
-            <p>{{ question['answer'] }}</p>
+    <p><strong>{{ question['question'] }}</strong></p>
 
-            <p><strong>Email</strong></p>
-            <p>{{ question['is_correct'] }}</p>
-
-        </div>
-
+    <div class="w-75 mx-auto">
+        <hr>
     </div>
-{% endfor %}
+
+    <div class="d-flex flex-row justify-content-around">
+        <form name="question" method="post" action="">
+            {% for key, value in question["answers"].items() %}
+                <button type="submit" class="btn btn-secondary" name="answer" value="{{ value}} ">{{ key }}</button>
+            {% endfor %}
+        </form>
+    </div>
+</div>
+    
 {% endblock %}

@@ -766,14 +766,14 @@ def takeQuiz():
 
     quizScore = 0
 
-    if qNum in session and request.method = "POST":
+    if "qNum" in session and request.method == "POST":
         if True in request.form:
             quizScore += 1
 
-        session["qnum"] += 1
+        session["qNum"] += 1
         question = qDict["questions"][session["qNum"]]
         return render_template('questionPage.html', title=title, question = question)
-    elif qNum in session:
+    elif "qNum" in session:
         question = qDict["questions"][session["qNum"]]
         return render_template('questionPage.html', title=title, question = question)
     else:
