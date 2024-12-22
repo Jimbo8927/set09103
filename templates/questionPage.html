@@ -1,24 +1,27 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
-
+<div class="m-auto">
 <div class="d-flex flex-column justify-content-around text-center">
-
+    <!-- displays title to user-->
     <h3><strong>{{ title }}</strong></h3>
-
+    <!-- displays current question to the user-->
     <p><strong>{{ question['question'] }}</strong></p>
 
     <div class="w-75 mx-auto">
         <hr>
     </div>
-
+    <!-- sets the value of the button to return the to server to the value of the question-(0 or 1)-->
+     <!-- sets the button text to the key - which is the question text-->
     <div class="d-flex flex-row justify-content-around">
         <form name="question" method="post" action="">
             {% for key, value in question["answers"].items() %}
-                <button type="submit" class="btn btn-secondary" name="answer" value="{{ value }}">{{ key }}</button>
+                <div class="p-2">
+                    <button type="submit" class="btn btn-secondary" name="answer" value="{{ value }}">{{ key }}</button>
+                </div>
             {% endfor %}
             <input type="hidden" name="quiz" value="{{ quizJson }}">
         </form>
     </div>
 </div>
-    
+</div>
 {% endblock %}

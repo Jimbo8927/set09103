@@ -3,22 +3,22 @@
 
 <h3 class="text-center">Choose a quiz below</h3>
 
+<!-- for each quiz in quizes, prints title and start button-->
 {% for quiz in quizes %}
     <div class="d-flex flex-row justify-content-around">
 
         <p><strong>{{ quiz['title'] }}</strong></p>
 
-        <form name="list-user" method="post" action="">
+        <form name="list-quizes" method="post" action="">
 
             <a href="/quiz"><button type="submit" class="btn btn-secondary" name="start" value="start">Start</button></a>
 
-            <a href="/leaderboard"><button type="submit" class="btn btn-secondary" name="leaderboard" value="leaderboard">Leaderboard</button></a>
-
+            <!-- if user is an admin, displays a delete button-->
             {% if 'account_type' in session and session['account_type'] == 'admin'  %}
                 <a href="/delete-quiz"><button type="submit" class="btn btn-secondary" name="delete" value="delete">Delete</button></a>
 
             {% endif %}
-
+            <!-- returns the quiz within the form-->
             <input type="hidden" name="quizId" value="{{ quiz['quiz_id'] }}">
         </form>
 

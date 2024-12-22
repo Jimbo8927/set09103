@@ -629,7 +629,7 @@ def createQuiz():
 
             quizId = getQuizID['last_insert_rowid()']
 
-            for count in range(10):
+            for count in range(int(numQuestions)):
                 question = request.form['question'+str(count+1)]
                 answerOne = request.form['answerOneQ'+str(count+1)]
                 answerTwo = request.form['answerTwoQ'+str(count+1)]
@@ -669,6 +669,7 @@ def createQuiz():
             return redirect(url_for("quizList"))
 
         except Exception as e:
+            flash(str(e))
             flash("Couldn't create a quiz at this time, try again later")
             return redirect(url_for("createQuiz"))
     else:
@@ -843,13 +844,6 @@ def takeQuiz():
         return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
 
 
-# leaderboard
-@app.route('/leaderboard', methods =['GET','POST'])
-@requires_login
-def leaderboard():
-    quizId = request.args["quizId"]
-    return quizId
-
 # delete quiz
 @app.route('/delete-quiz', methods =['GET','POST'])
 @requires_admin
@@ -873,7 +867,7 @@ def deleteQuiz():
 
 
             cursor.execute(quizQuery, (quizId,))
-            quizIds = cursor.fetchone()
+            quizIds = cursor.fetchall()
 
             deleteQuery = """
                           begin
@@ -886,9 +880,13 @@ def deleteQuiz():
                           """
 
             return str(quizIds["question_id"])
+        except:
+            flash("Couldn't delete the quiz at this time")
+            return redirect(url_for("quizList"))
 
     else:
-        render_template("")
+        quizId = request.args["quizId"]
+        return render_template("delete-quiz.html", quizId = quizId)
 # print config information to the user
 # uses decorator fuction requires_admin to ensure an admin is logged in before displaying information
 @app.route('/config')
