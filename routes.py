@@ -3,7 +3,7 @@ from flask import Flask, render_template, g, session, request, url_for, redirect
 # imports wraps from functools
 from functools import wraps
 # imports sqlite3, configparser, secrets and bcrypt
-import sqlite3, configparser, secrets, bcrypt
+import sqlite3, configparser, secrets, bcrypt, json
 
 app = Flask(__name__)
 
@@ -776,9 +776,10 @@ def startQuiz():
                                }})
                     count += 1
 
-            quiz = qDict
-
-            return render_template('quizStart.html', quiz=quiz)
+            title = row["title"]
+            quiz = json.dumps(qDict)
+            #return quiz
+            return render_template('quizStart.html', title=title, quiz=quiz)
         except Exception as e:
             flash(str(e))
             flash("Sorry, couldn't continue with the quiz. Please try again later.")
@@ -789,40 +790,54 @@ def startQuiz():
 @requires_login
 def takeQuiz():
 
-    if "quiz" in request.args:
-        quiz = request.args["quiz"]
-    else:
-        raise ValueError("quiz not in args")
-
     if "qNum" in session and request.method == "POST":
         try:
-            qNumb = int(session["qNum"])
 
-            if True in request.form:
+            if "quiz" in request.form:
+                quizJson = request.form["quiz"]
+                quiz = json.loads(quizJson)
+
+            else:
+                #raise ValueError("quiz not in args")
+                return "back here"
+
+            qNumb = int(session["qNum"])
+            qNumb += 1
+            session["qNum"] = qNumb
+
+            if request.form["answer"] == "1":
                 quizScore = int(session["quizScore"])
                 quizScore += 1
                 session["quizScore"] = quizScore
 
-            qNumb += 1
 
-            question = quiz["questions"]["qNumb"]
+            question = quiz["questions"][session["qNum"]]
 
-            session["qNum"] = qNumb
 
-            return render_template('questionPage.html', quiz = quiz, question = question)
+            return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
 
-        except:
+        except Exception as e:
+            flash(str(e))
             flash("Sorry, couldn't continue with the quiz. Please try again later.")
             return redirect(url_for("home"))
 
     else:
-        session["qNum"] = 1
+
+        if "quiz" in request.args:
+            quizJson = request.args["quiz"]
+            quiz = json.loads(quizJson)
+
+        else:
+            #raise ValueError("quiz not in args")
+            return "last here"
+
+        session["qNum"] = "1"
         session["quizScore"] = 0
         qNumb = int(session["qNum"])
 
-        question = quiz["questions"][qNumb]
-        return render_template('questionPage.html', quiz = quiz, question = question)
-
+        question = quiz["questions"][session["qNum"]]
+        return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
+        #return quiz
 
 # leaderboard
 @app.route('/leaderboard', methods =['GET','POST'])

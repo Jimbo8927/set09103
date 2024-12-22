@@ -14,8 +14,9 @@
     <div class="d-flex flex-row justify-content-around">
         <form name="question" method="post" action="">
             {% for key, value in question["answers"].items() %}
-                <button type="submit" class="btn btn-secondary" name="answer" value="{{ value}} ">{{ key }}</button>
+                <button type="submit" class="btn btn-secondary" name="answer" value="{{ value }}">{{ key }}</button>
             {% endfor %}
+            <input type="hidden" name="quiz" value="{{ quizJson }}">
         </form>
     </div>
 </div>
