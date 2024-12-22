@@ -778,7 +778,7 @@ def startQuiz():
 
             title = row["title"]
             quiz = json.dumps(qDict)
-            #return quiz
+
             return render_template('quizStart.html', title=title, quiz=quiz)
         except Exception as e:
             flash(str(e))
@@ -798,8 +798,8 @@ def takeQuiz():
                 quiz = json.loads(quizJson)
 
             else:
-                #raise ValueError("quiz not in args")
-                return "back here"
+                flash("Sorry, couldn't continue with the quiz. Please try again later.")
+                return redirect(url_for("home"))
 
             qNumb = int(session["qNum"])
             qNumb += 1
@@ -812,15 +812,15 @@ def takeQuiz():
 
 
             numQuestions = len(quiz["questions"])
-            #return str(qNumb) + " " +str(numQuestions)
+
             if qNumb > numQuestions:
-                return render_template("quiz-score.html", score = int(session["quizScore"]))
+                return render_template("quiz-score.html", score = int(session["quizScore"]), numQuestions = numQuestions)
             else:
                 question = quiz["questions"][session["qNum"]]
                 return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
 
         except Exception as e:
-            flash(str(e))
+
             flash("Sorry, couldn't continue with the quiz. Please try again later.")
             return redirect(url_for("home"))
 
@@ -829,12 +829,11 @@ def takeQuiz():
         if "quiz" in request.args:
             quizJson = request.args["quiz"]
             quiz = json.loads(quizJson)
-            #return str(len(quiz["questions"]))
-            #return quiz
+
 
         else:
-            #raise ValueError("quiz not in args")
-            return "last here"
+            flash("Sorry, couldn't continue with the quiz. Please try again later.")
+            return redirect(url_for("home"))
 
         session["qNum"] = "1"
         session["quizScore"] = 0
@@ -842,7 +841,7 @@ def takeQuiz():
 
         question = quiz["questions"][session["qNum"]]
         return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
-        #return quiz
+
 
 # leaderboard
 @app.route('/leaderboard', methods =['GET','POST'])
@@ -855,9 +854,41 @@ def leaderboard():
 @app.route('/delete-quiz', methods =['GET','POST'])
 @requires_admin
 def deleteQuiz():
-    quizId = request.args["quizId"]
-    return quizId
+    if request.method == "POST":
+        try:
 
+            quizId = request.args["quizId"]
+
+            db = get_db()
+            db.row_factory = sqlite3.Row
+            cursor = db.cursor()
+
+            quizQuery = """
+                        SELECT questions.question_id, answers.answer_id
+                        FROM questions
+                        JOIN answers
+                        ON questions.question_id = answers.question_id
+                        WHERE questions.quiz_id = ?
+                        """
+
+
+            cursor.execute(quizQuery, (quizId,))
+            quizIds = cursor.fetchone()
+
+            deleteQuery = """
+                          begin
+                          Delete FROM quizzes
+                          WHERE quiz_id = ?
+                          Delete FROM questions
+                          WHERE quiz_id = ?
+                          Delete FROM answers
+                          WHERE question_id = ?
+                          """
+
+            return str(quizIds["question_id"])
+
+    else:
+        render_template("")
 # print config information to the user
 # uses decorator fuction requires_admin to ensure an admin is logged in before displaying information
 @app.route('/config')
