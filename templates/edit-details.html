@@ -3,46 +3,53 @@
 <h1 class="text-center">Edit Details Below</h1>
 
 <h3 class="text-center p-3"> {{ error }} </h3>
-{% if 'account_type in session' and session['account_type'] == 'user' %}
-<div class="text-end px-3">
-    <a href="/profile/edit-account-details/edit-password"> <button type="submit" class="btn btn-secondary">Change Password</button></a>
-</div>
-{% elif 'account_type in session' and session['account_type'] == 'admin' %}
-<div class="text-end px-3">
-    <a href="/profile/edit-account-details/update-password"> <button type="submit" class="btn btn-secondary">Change Password</button></a>
-</div>
-{% endif %}
 
-<form name="add-admin-account" action="" method="post">
-
-
-    <div class="d-flex flex-row justify-content-around">
-
-        <div class="d-flex flex-column">
-            <label for="fname">First Name </label><br>
-            <input type="text" id="fname" name="fname" value="{{ fname }}" required> </input><br>
-
-           <label for="surname">Surname</label><br>
-           <input type="text" id="surname" name="surname" value="{{ surname }}" required> </input><br>
-        </div>
-
-        <div class="d-flex flex-column">
-            <label for="username">Username</label><br>
-            <input type="text" id="username" name="username" value="{{ username }}" required> </input><br>
-
-            <label for="email">Email Address</label><br>
-            <input type="email" id="email" name="email" value="{{ email }}" required> </input><br>
-        </div>
-    </div>
-    <div class="text-center">
-        <button type="submit" class="btn btn-secondary " name="button" value="sign up">Update Details</button>
+<div class="my-auto text-center">
+    <!-- displays different button depending on the user type-->
+    {% if 'account_type in session' and session['account_type'] == 'user' %}
+    <div class="text-end px-3">
+        <a href="/profile/edit-account-details/edit-password"> <button type="submit" class="btn btn-secondary">Change Password</button></a>
     </div>
 
-</form>
-<div class="text-center">
-    <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
-</div>
+    {% elif 'account_type in session' and session['account_type'] == 'admin' %}
+    <div class="text-end px-3">
+        <a href="/profile/edit-account-details/update-password"> <button type="submit" class="btn btn-secondary">Change Password</button></a>
+    </div>
+    {% endif %}
+    
+    <!-- displays input fields to the user with their current details within them-->
+    <form name="add-admin-account" action="" method="post">
 
+
+        <div class="d-flex flex-wrap justify-content-around">
+
+            <div class="d-flex flex-column">
+                <label for="fname">First Name </label><br>
+                <input type="text" id="fname" name="fname" value="{{ fname }}" required> </input><br>
+
+               <label for="surname">Surname</label><br>
+               <input type="text" id="surname" name="surname" value="{{ surname }}" required> </input><br>
+            </div>
+
+            <div class="d-flex flex-column">
+                <label for="username">Username</label><br>
+                <input type="text" id="username" name="username" value="{{ username }}" required> </input><br>
+
+                <label for="email">Email Address</label><br>
+                <input type="email" id="email" name="email" value="{{ email }}" required> </input><br>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-secondary " name="button" value="sign up">Update Details</button>
+        </div>
+
+    </form>
+    <!-- takes the user back to their profile -->
+    <div class="text-center p-5">
+        <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
+    </div>
+</div>
 
 
 {% endblock %}

@@ -1,14 +1,14 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
 <h1 class="text-center">Enter Details Below</h1>
-
+<!-- displays error when needed-->
 <h3 class="text-center p-3"> {{ error }} </h3>
 <div class="my-auto">
 
     <form name="add-admin-account" action="" method="post">
 
-
-        <div class="d-flex flex-lg-row flex-sm-column justify-content-around">
+        <!-- displays input fields, wraps input fields on smaller screens-->
+        <div class="d-flex flex-wrap justify-content-around">
 
             <div class="d-flex flex-column">
                 <label for="fname">First Name </label><br>

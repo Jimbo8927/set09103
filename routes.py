@@ -796,13 +796,18 @@ def takeQuiz():
 
     if "qNum" in session and request.method == "POST":
         try:
+            qNumb = int(session["qNum"])
 
             if True in request.form:
+                quizScore = int(session["quizScore"])
                 quizScore += 1
+                session["quizScore"] = quizScore
 
-            session["qNum"] += 1
-            question = quiz["questions"][session["qNum"]]
+            qNumb += 1
 
+            question = quiz["questions"]["qNumb"]
+
+            session["qNum"] = qNumb
 
             return render_template('questionPage.html', quiz = quiz, question = question)
 
@@ -813,7 +818,9 @@ def takeQuiz():
     else:
         session["qNum"] = 1
         session["quizScore"] = 0
-        question = quiz["questions"][session["qNum"]]
+        qNumb = int(session["qNum"])
+
+        question = quiz["questions"][qNumb]
         return render_template('questionPage.html', quiz = quiz, question = question)
 
 

@@ -1,7 +1,8 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
 <script>
-
+    // calls the createQuizInputFields function with 10 inputs
+    // on page load, function in quizzle.js
     window.onload = function loadFunction() {
         createQuizInputFields(10);
     }
@@ -11,13 +12,14 @@
 <div class="m-auto text-center">
     <h3> Create Quiz </h3>
     <strong><p>How many questions?</p></strong>
+    <!-- call createQuizInputFields onclick, each button create a different amount of boxes -->
     <button name="quiz-size" class="btn btn-secondary" type="button" onclick="createQuizInputFields(10)" value="10">10</button>
     <button name="quiz-size" class="btn btn-secondary" type="button" onclick="createQuizInputFields(20)" value="20">20</button>
  
 </div>
 
 
-
+<!-- designates an area for the quiz input fields through createQuizInputFields function-->
 <div id="quizInput" class="p-3 text-center m-auto">
 
 </div>

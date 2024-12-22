@@ -2,8 +2,11 @@
 {% block content %}
 <div class ="text-center p-3">
 <h4>Account Added Successfully, take note of the password as once you leave this page you will no longer be able to retrieve it. </h4>
+</div>
 
-  <div class="d-flex flex-row justify-content-around">
+<div class="my-auto">
+  <!-- displays the newly created admin accounts details -->
+  <div class="d-flex flex-wrap justify-content-around">
 
         <div class="d-flex flex-column">
             <label>First Name: </label><br>
@@ -26,4 +29,5 @@
             <p> {{ password }} </p><br>
         </div>
     </div>
+</div>
 {% endblock %}

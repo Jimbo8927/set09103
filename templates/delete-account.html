@@ -4,11 +4,13 @@
         <h3 class="text-center text-danger">Are you sure you want to delete this account?</h3>
         <h3 class= "text-center text-danger">Decision cannot be reversed</h3>
 
-
+        <div class="d-flex flex-row justify-content-around p-3">
         <form name="delete" method="post" action="">
             <button type="submit" class="btn btn-secondary">Delete Account</button>
         </form>
 
+        <!-- display a different canel button depening on whether an admin is trying to delete a user or an admin -->
+        <!-- or is a user either admin or normal user is trying to delete their own account -->
         {% if delUsername and delAccType == 'user' %}
             <a href="/list-users"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
         {% elif delUsername and delAccType == 'admin' %}
@@ -16,6 +18,7 @@
         {% else %}
             <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
         {% endif%}
+        </div>
     </div>
 
 {% endblock %}

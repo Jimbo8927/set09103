@@ -2,35 +2,40 @@
 {% block content %}
 <h3 class="text-center">Update Password Below, alternativley click cancel to return</h3>
 
+<!-- displays error message to user when an error occurs-->
 <h5 class="text-center p-3"> {{ error }} </h5>
 
+<!-- displays error message to user when an error occurs - error comes from checkPass function in quizzle.js-->
 <div class="text-center p-3 text-danger">
    <strong><label id="errorMessage"></label></strong>
 </div>
 
-<form name="sign-up" id="sign-up" action="" method="post">
+<!-- centers content -->
+<div class="m-auto">
+    <form name="sign-up" id="sign-up" action="" method="post">
 
 
-    <div class="d-flex flex-row justify-content-around">
+        <div class="d-flex flex-row justify-content-around">
+            <!--  displays input boxes for user to change password-->
+            <div class="d-flex flex-column">
+                <label for="password"><strong>Password</strong></label><br>
+                <input type="password" id="password" name="password" required> </input><br>
 
-        <div class="d-flex flex-column">
-            <label for="password"><strong>Password</strong></label><br>
-            <input type="password" id="password" name="password" required> </input><br>
-
-            <label for="confirm-password"><strong>Confirm Password</strong></label><br>
-            <input type="password" id="confirm-password" name="confirm-password" required> </input><br>
+                <label for="confirm-password"><strong>Confirm Password</strong></label><br>
+                <input type="password" id="confirm-password" name="confirm-password" required> </input><br>
+            </div>
         </div>
+
+        <div class="text-center">
+            <!--  checkPass function check if both password fields are the same otherwise returns error -->
+            <button type="button" class="btn btn-secondary" name="button" onClick="checkPass(event)" value="update password">Update Password</button>
+        </div>
+
+    </form>
+
+    <div class="text-center p-3">
+        <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
     </div>
-
-    <div class="text-center">
-        <button type="button" class="btn btn-secondary" name="button" onClick="checkPass(event)" value="update password">Update Password</button>
-    </div>
-
-</form>
-
-<div class="text-center">
-    <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
 </div>
-
 
 {% endblock %}

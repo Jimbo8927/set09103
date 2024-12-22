@@ -6,12 +6,16 @@
 	<title>{{ pageTitle }}</title>
 	<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" />
 </head>
+<!-- base page layout-->
 <body class="d-flex flex-column min-vh-100">
+        <!-- pulls in bootstrap files and a custom js file-->
 	<script src="{{ url_for('static', filename='/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ url_for('static', filename='/js/quizzle.js') }}"></script>
-
+        
+        <!-- adds the navbar to the page-->
 	{% include 'navbar.html'  %}
 
+        <!-- adds flashed messaged to the page-->
         {% with messages = get_flashed_messages()  %}
             {% if messages %}
                 {% for message in messages %}
@@ -19,10 +23,11 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
- 
+        
+        <!-- used to designate the space of child pages through inheritance -->
 	{% block content %} {% endblock %}
 
-
+         <!-- adds the footer to the page -->
 	{% include 'footer.html'  %}
 	
 </body>

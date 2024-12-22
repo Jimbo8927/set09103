@@ -1,14 +1,18 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+<!-- checks to ensure user is an admin -->
 {% if 'account_type' in session and session['account_type'] == 'admin' %}
 
+    <!-- displays username if in session-->
     {% if 'username' in session %}
         <h5 class="text-center">{{ session['username'] }}</h5><br><br>
     {% endif %}
-
+    
+    <!-- displays warning message and new password to admin-->
     <h5 class="text-center">{{ passMessage1 }}</h5>
     <h5 class="text-center">{{ passMessage2 }}</h5>
 {% else %}
+   <!-- redirect user if they are not admin -->
     <script>
         window.location.replace(" {{ url_for('home')}} ")
     </script>

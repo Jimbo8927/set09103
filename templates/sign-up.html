@@ -2,17 +2,19 @@
 {% block content %}
 <!-- page title -->
 <h1 class="text-center">Enter Details Below</h1>
-
+<!-- displays error message when needed-->
 <h5 class="text-center p-3"> {{ error }} </h5>
 
+<!-- displays error message when needed, through dom - checkSignUp js function inside quizzle.js-->
 <div class="text-center p-3 text-danger">
    <strong><label id="errorMessage"></label></strong>
 </div>
 
+<!-- centers content horizontally-->
 <div class="my-auto">
     <form name="sign-up" id="sign-up" action="" method="post">
     
-
+        <!-- display and warp input fields when needed-->
         <div class="d-flex flex-wrap justify-content-around">
 
             <div class="d-flex flex-column">
@@ -40,6 +42,7 @@
             </div>
         </div>
         <div class="text-center">
+            <!-- uses event to catch the form submission and use checkSignUp to ensure both password input fields are the same-->
             <button type="button" class="btn btn-secondary" name="button" onClick="checkSignUp(event)" value="sign up">Sign Up</button>
         </div>
 

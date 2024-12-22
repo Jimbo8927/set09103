@@ -1,20 +1,22 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+<div class="m-auto">
+    <!-- displays message to user-->
+    <strong><h3 class="text-center text-danger">Are you sure you want to change your password, this cannot be undone? </h3></strong>
+    <!-- confirm account deleteion-->
+    <div class="d-flex flex-row justify-content-around">
+         <form name="add-admin-account" action="" method="post">
+             <div class="text-center">
+                <button type="submit" class="btn btn-secondary " name="button" value="update password">Change Password</button>
+            </div>
 
-<strong><h3 class="text-center text-danger">Are you sure you want to change your password, this cannot be undone? </h3></strong>
-
-<div class="d-flex flex-row justify-content-around">
-    <form name="add-admin-account" action="" method="post">
+         </form>
+        <!-- directs user back to their profile -->
         <div class="text-center">
-            <button type="submit" class="btn btn-secondary " name="button" value="update password">Change Password</button>
+            <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
         </div>
-
-    </form>
-    <div class="text-center">
-        <a href="/profile"> <button type="submit" class="btn btn-secondary">Cancel</button></a>
     </div>
 </div>
-
 
 
 {% endblock %}
