@@ -1,14 +1,16 @@
 {% extends "baseTemplate.html" %}
 {% block content %}
+<!-- checks for username, if found prints it with welcome message, else prints standard welcome message-->
 {% if 'username' in session %}
     <h3 class="text-center">Welcome {{ session['username'] }}</h3>
 {% else %}
     <h3 class="text-center">Welcome to Quizzle</h3>
 {% endif %}
-
-
-<p></p>
-
+<!-- prints info paragraph-->
+<div class= "text-center m-auto">
+    <p>Test your knowledge with our new quiz app.<br> Can you become the Quizzle master?<br> New quizes added weekly.<br> 
+    All new look and features coming soon!<br> create your own quiz, compete with friends, get to the top of the leaderboard and more!</p>
+</div>
 
 
 

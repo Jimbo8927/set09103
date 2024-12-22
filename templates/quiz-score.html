@@ -1,0 +1,12 @@
+{% extends "baseTemplate.html" %}
+{% block content %}
+<div class="m-auto text-center">
+    {% if score > 8 %}
+        <h3> Wow! Amazing work!</h3>
+    {% elif score > 5 %}
+        <h3> Could be worse I suppose</h3>
+    {% else%}
+        <h3>c'mon, a 2 year old could do better, unless you are 2 then well done you! </h3>
+    {% endif %}
+</div>
+{% endblock %}

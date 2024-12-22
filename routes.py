@@ -803,7 +803,7 @@ def takeQuiz():
 
             qNumb = int(session["qNum"])
             qNumb += 1
-            session["qNum"] = qNumb
+            session["qNum"] = str(qNumb)
 
             if request.form["answer"] == "1":
                 quizScore = int(session["quizScore"])
@@ -811,10 +811,13 @@ def takeQuiz():
                 session["quizScore"] = quizScore
 
 
-            question = quiz["questions"][session["qNum"]]
-
-
-            return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
+            numQuestions = len(quiz["questions"])
+            #return str(qNumb) + " " +str(numQuestions)
+            if qNumb > numQuestions:
+                return render_template("quiz-score.html", score = int(session["quizScore"]))
+            else:
+                question = quiz["questions"][session["qNum"]]
+                return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
 
         except Exception as e:
             flash(str(e))
@@ -826,6 +829,8 @@ def takeQuiz():
         if "quiz" in request.args:
             quizJson = request.args["quiz"]
             quiz = json.loads(quizJson)
+            #return str(len(quiz["questions"]))
+            #return quiz
 
         else:
             #raise ValueError("quiz not in args")
