@@ -6,9 +6,9 @@
 {% if numQuestions and numQuestions > 10 %}
     {% if score %}
         <h3> You scored {{ score }}/{{ numQuestions}}</h3>
-        {% if score > 8 %}
+        {% if score > 14 %}
             <h3> Wow! Amazing work!</h3>
-        {% elif score > 4 %}
+        {% elif score > 8 %}
             <h3> Could be worse I suppose</h3>
         {% else%}
             <h3>c'mon, a 2 year old could do better, unless you are 2 then well done you! </h3>
@@ -19,9 +19,9 @@
 {% elif numQuestions %} 
     {% if score %}
         <h3> You scored {{ score }}/{{ numQuestions}}</h3>
-        {% if score > 14 %}
+        {% if score > 6 %}
             <h3> Wow! Amazing work!</h3>
-        {% elif score > 8 %}
+        {% elif score > 4 %}
             <h3> Could be worse I suppose</h3>
         {% else%}
             <h3>c'mon, a 2 year old could do better, unless you are 2 then well done you! </h3>
