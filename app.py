@@ -20,7 +20,6 @@ def init(app):
         app.config['ip_address'] = config.get("config", "ip_address")
         app.config['port'] = config.get("config", "port")
         app.config['url'] = config.get("config", "url")
-        app.config['db_location'] = config.get("config", "db_location")
         app.secret_key = config.get("config", "secret_key")
     except:
         print("Cound not read configs from: ", config_location)
@@ -598,7 +597,7 @@ def listAdmin():
             return redirect(url_for('home'))
 
 
-# create quiz - creates a quiz based on dat apassed back from input fields
+# create quiz - creates a quiz based on data passed back from input fields
 #
 @app.route('/create-quiz', methods =['GET','POST'])
 @requires_admin
