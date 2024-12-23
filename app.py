@@ -22,15 +22,12 @@ def init(app):
         app.config['url'] = config.get("config", "url")
         app.config['db_location'] = config.get("config", "db_location")
         app.secret_key = config.get("config", "secret_key")
+        db_location = config.get("config", "db_location")
     except:
         print("Cound not read configs from: ", config_location)
 
 # calls the above init function
 init(app)
-
-print(app.secret_key) # remove after changing key ----------------
-
-db_location = 'var/quizzle.db' # posibly remove and test with using config file input instead -----------
 
 # connects to the database for quizzle using the db_locaton variable
 def get_db():
