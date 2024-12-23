@@ -599,36 +599,47 @@ def listAdmin():
             return redirect(url_for('home'))
 
 
-# create quiz - choose name and size of quiz
+# create quiz - creates a quiz based on dat apassed back from input fields
+#
 @app.route('/create-quiz', methods =['GET','POST'])
 @requires_admin
 def createQuiz():
     if request.method == "POST":
         try:
+
             db = get_db()
             db.row_factory = sqlite3.Row
             cursor = db.cursor()
 
+            # sets numQuestions to the amount of questions returned from the form
             numQuestions = request.form['numQuestions']
+
 
             quizName = request.form['quiz-name']
             creatorID = session['id']
+
 
             quizNameInsertQuery = """
                                   INSERT INTO quizzes (admin_id, title)
                                   VALUES (?, ?)
                                   """
+
             cursor.execute(quizNameInsertQuery, (creatorID, quizName))
 
+            # selects the last inserted rows id
             quizIdQuery = """
                       SELECT last_insert_rowid()
                       """
 
             cursor.execute(quizIdQuery)
+
             getQuizID = cursor.fetchone()
 
+            # sets the last inserted rows id based on returned column
             quizId = getQuizID['last_insert_rowid()']
 
+            # loops through the questions returned getting their values from request.form and inserts
+            # their questions and all 4 answers into their respective databases
             for count in range(int(numQuestions)):
                 question = request.form['question'+str(count+1)]
                 answerOne = request.form['answerOneQ'+str(count+1)]
@@ -669,14 +680,14 @@ def createQuiz():
             return redirect(url_for("quizList"))
 
         except Exception as e:
-            flash(str(e))
+            # returns user to create quiz if their is an error during insertion
             flash("Couldn't create a quiz at this time, try again later")
             return redirect(url_for("createQuiz"))
     else:
         return render_template("create-quiz-Q-A.html")
 
 # quiz list - lists all current quizes
-# queries the quizzes database table returning the title and id of each
+# queries the quizzes database table returning the title and id of each quiz available
 # redirects the user to the home page, returning an error message if the list cannot be returned
 @app.route('/quiz-list', methods =['GET','POST'])
 @requires_login
@@ -713,17 +724,23 @@ def quizList():
             flash("Couldn't display the quizes at this time, please try again later")
             return redirect(url_for("home"))
 
-# startQuiz
+# startQuiz - is a page where a user chooses to start the quiz or return to the quiz list
+# if the user chooses to start the quiz the database is querried returning the quiz chosen in the quiz list
+# both questions and answers are retruned in a randomised order and added to a dictionary
+# ensuring that each time a quiz is taken, the order for answers and question are different
 @app.route('/quiz', methods =['GET','POST'])
 @requires_login
 def startQuiz():
 
     if request.method == "POST":
 
+        # checks if quiz is returned through the form submission
+        # redirects user to take quiz if quiz is available
         if "quiz" in request.form:
             quiz = request.form["quiz"]
             return redirect(url_for('takeQuiz', quiz = quiz))
         else:
+            # redirects user to the home route if quiz isn't available
             flash("Sorry, couldn't continue with the quiz. Please try again later.")
             return redirect(url_for("home"))
 
@@ -731,6 +748,7 @@ def startQuiz():
         try:
             quizId = request.args["quizId"]
 
+            # retrieves the full quiz information, title, questions and answers
             db = get_db()
             db.row_factory = sqlite3.Row
             cursor = db.cursor()
@@ -750,24 +768,33 @@ def startQuiz():
             cursor.execute(quizQuery, (quizId,))
             quiz = cursor.fetchall()
 
+            # creates a dictionary to store the quiz
             qDict = {}
             count = 1
 
+            # loops through each row returned through the query
             for row in quiz:
-
+                # checks if title is in the dictionary and adds the title
+                # and an empty quetion dict
                 if "title" not in qDict:
                     qDict.update({"title": row["title"]})
                     qDict.update({"questions": {}})
 
                 questionId = row["question_id"]
                 questionInDict = False
-
+                # loops through each question in qDict
                 for question in qDict["questions"].values():
 
+                    # if the question id within qdict matches the id from the current row
+                    # updates questions answers setting the question as the key
+                    # and the value as is_correct to trach which answer is true
+                    # sets questionInDict to true
                     if question["qId"] == questionId:
                         question["answers"].update({row["answer"]: row["is_correct"]})
                         questionInDict = True
 
+                # if the question is not in the dictionary a new quetion entry is created and updated
+                # with the question id, question text and current answer on the row
                 if not questionInDict:
                     qDict["questions"].update({
                         count: {
@@ -777,43 +804,57 @@ def startQuiz():
                                }})
                     count += 1
 
+            # sets title to title of retrieved quiz
+            # sest quiz to qDict converted to json for being moved around and keeping
+            # its format
             title = row["title"]
             quiz = json.dumps(qDict)
 
             return render_template('quizStart.html', title=title, quiz=quiz)
         except Exception as e:
-            flash(str(e))
             flash("Sorry, couldn't continue with the quiz. Please try again later.")
             return redirect(url_for("home"))
 
-# takeQuiz
+# take quiz - allows users to take a quiz making use of the quiz created in the startQuiz route
+# moves through questions updating the users score as they answer, once the quiz is finished
+# users are naviagted to their results which displays their score with a message based on their score
 @app.route('/quiz/question', methods =['GET','POST'])
 @requires_login
 def takeQuiz():
 
     if "qNum" in session and request.method == "POST":
         try:
-
+            # checks to see if quiz is within request.form
+            # converst the quiz back from json to be used within the quiz
             if "quiz" in request.form:
                 quizJson = request.form["quiz"]
                 quiz = json.loads(quizJson)
 
             else:
+                # redirects user back to home page with error message if the quiz isn't avalable
                 flash("Sorry, couldn't continue with the quiz. Please try again later.")
                 return redirect(url_for("home"))
 
+            # converts session["qNumb"] to an int to allow adding 1, to select question 2
+            # converts it back to ensure it has teh same datatype as the dictionary key
             qNumb = int(session["qNum"])
             qNumb += 1
             session["qNum"] = str(qNumb)
 
+            # checks if 1 is returned from form on each post request
+            # if 1 is returned, the user has selected the correct answer
+            # quizScore is increased by 1
             if request.form["answer"] == "1":
                 quizScore = int(session["quizScore"])
                 quizScore += 1
                 session["quizScore"] = quizScore
 
-
+            # gets the number of questions in the quiz for displayin the users score
             numQuestions = len(quiz["questions"])
 
+            # checks if question number is higher than the number of questions
+            # if higher, renders template to display the users score
+            # otherwise keeps cycling through the questions
             if qNumb > numQuestions:
                 return render_template("quiz-score.html", score = int(session["quizScore"]), numQuestions = numQuestions)
             else:
@@ -827,6 +868,8 @@ def takeQuiz():
 
     else:
 
+        # checks to see if quiz is with request.args
+        # converst the quiz back from json to be used within the quiz
         if "quiz" in request.args:
             quizJson = request.args["quiz"]
             quiz = json.loads(quizJson)
@@ -836,10 +879,11 @@ def takeQuiz():
             flash("Sorry, couldn't continue with the quiz. Please try again later.")
             return redirect(url_for("home"))
 
+        # sets session variables for taking a quiz
         session["qNum"] = "1"
         session["quizScore"] = 0
-        qNumb = int(session["qNum"])
 
+        # sets question to the first question in the quiz
         question = quiz["questions"][session["qNum"]]
         return render_template('questionPage.html', quizJson = quizJson, quiz = quiz, question = question)
 
@@ -857,36 +901,65 @@ def deleteQuiz():
             db.row_factory = sqlite3.Row
             cursor = db.cursor()
 
+            # selects ID's for deleting a quiz
             quizQuery = """
-                        SELECT questions.question_id, answers.answer_id
+                        SELECT questions.question_id
                         FROM questions
-                        JOIN answers
-                        ON questions.question_id = answers.question_id
                         WHERE questions.quiz_id = ?
                         """
 
 
             cursor.execute(quizQuery, (quizId,))
-            quizIds = cursor.fetchall()
+            quizQId = cursor.fetchall()
 
-            deleteQuery = """
-                          begin
-                          Delete FROM quizzes
-                          WHERE quiz_id = ?
-                          Delete FROM questions
-                          WHERE quiz_id = ?
-                          Delete FROM answers
-                          WHERE question_id = ?
-                          """
+            # delete queries
+            quizDeleteQuery = """
+                              Delete FROM quizzes
+                              WHERE quiz_id = ?
+                              """
 
-            return str(quizIds["question_id"])
-        except:
+            questionDeleteQuery = """
+                                  Delete FROM questions
+                                  WHERE quiz_id = ?
+                                  """
+
+            answerDeleteQuery = """
+                                Delete FROM answers
+                                WHERE question_id = ?
+                                """
+            # creates a transaction - ensures each delete query executes successfully
+            # if one fails they all do
+            cursor.execute("begin")
+            try:
+
+                for row in quizQId:
+                    questionId = row["question_id"]
+                    cursor.execute(answerDeleteQuery, (questionId,))
+
+                cursor.execute(questionDeleteQuery, (quizId,))
+
+                cursor.execute(quizDeleteQuery, (quizId,))
+
+            except:
+                cursor.execute("rollback")
+                flash("couldn't delete quiz at this time")
+                return redirect(url_for("quizList"))
+
+            #commits changes
+            db.commit()
+
+            flash("Quiz Deleted")
+            return redirect(url_for("quizList"))
+
+        except Exception as e:
+            flash(str(e))
             flash("Couldn't delete the quiz at this time")
             return redirect(url_for("quizList"))
 
     else:
         quizId = request.args["quizId"]
         return render_template("delete-quiz.html", quizId = quizId)
+
 # print config information to the user
 # uses decorator fuction requires_admin to ensure an admin is logged in before displaying information
 @app.route('/config')
