@@ -276,11 +276,20 @@ def editDetails():
                     flash("Email is in use, please choose another")
                     return redirect(url_for('editDetails'))
 
-            updateQuery = """
-                          UPDATE users
-                          SET first_name = ?, surname = ?, email_address = ?, username = ?
-                          WHERE username = ?
-                          """
+            if "account_type" and session["account_type"] == "user":
+                updateQuery = """
+                              UPDATE users
+                              SET first_name = ?, surname = ?, email_address = ?, username = ?
+                              WHERE username = ?
+                              """
+            elif "account_type" and session["account_type"] == "admin":
+                updateQuery = """
+                              UPDATE admins
+                              SET first_name = ?, surname = ?, email_address = ?, username = ?
+                              WHERE username = ?
+                              """
+            else:
+                raise ValueError("account type invalid")
 
             cursor.execute(updateQuery, (name, surname, email, username, sessionUsername))
             db.commit()
