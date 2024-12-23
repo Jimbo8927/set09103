@@ -1,2 +1,2 @@
-from routes import init_db
+from app import init_db
 init_db()
